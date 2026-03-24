@@ -1,0 +1,24 @@
+[package]
+name = "map-engine"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"] # Crucial para generar el binario WASM
+
+[dependencies]
+bevy = { version = "0.13", default-features = false, features = [
+    "bevy_winit", 
+    "bevy_render", 
+    "bevy_core_pipeline", 
+    "bevy_sprite", 
+    "bevy_text", # <--- FUNDAMENTAL para TextBundle
+    "bevy_ui",   # <--- FUNDAMENTAL para Style y Val
+    "webgl2"
+] }
+wasm-bindgen = "0.2"
+console_error_panic_hook = "0.1.7"
+getrandom = { version = "0.3", features = ["wasm_js"] }
+uuid = { version = "1.0", features = ["v4", "js"] }
+web-sys = { version = "0.3", features = ["Window"] }
+js-sys = "0.3" # Añade esta para el manejo de objetos JS
