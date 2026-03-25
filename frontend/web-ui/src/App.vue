@@ -2,8 +2,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import init from './wasm-map/map_engine.js';
-import wasmUrl from './wasm-map/map_engine_bg.wasm?url';
+import init from './wasm/map_engine.js';
+import wasmUrl from './wasm/map_engine_bg.wasm?url';
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
