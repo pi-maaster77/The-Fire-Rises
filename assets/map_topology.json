@@ -1,0 +1,12 @@
+{
+  "regions": [
+    { "id": "NOR", "name": "Norte" }
+  ],
+  "states": [
+    { "id": "EST", "name": "Noreste", "parent_region": "NOR" }
+  ],
+  "provinces": [
+    { "id": "NOREST001", "state_id": "EST", "name": "San Miguel", "x": 0, "y": 7 },
+    { "id": "NOREST002", "state_id": "EST", "name": "Pilar", "x": 1, "y": 7 }
+  ]
+}

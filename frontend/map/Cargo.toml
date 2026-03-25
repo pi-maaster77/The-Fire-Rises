@@ -10,9 +10,10 @@ crate-type = ["cdylib", "rlib"] # cdylib para WASM, rlib para app nativa
 bevy = "0.13"
 wasm-bindgen = "0.2"
 uuid = { version = "1.12", features = ["js"] }
-# Mantén también getrandom por si acaso
 getrandom = { version = "0.3", features = ["wasm_js"] }
 once_cell = "1.19"
+serde = { version = "1.0", features = ["derive"] }
+serde-wasm-bindgen = "0.6"
 
 [profile.release]
 lto = true
