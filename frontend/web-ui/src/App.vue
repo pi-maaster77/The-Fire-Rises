@@ -23,7 +23,7 @@ onMounted(async () => {
     console.log("Bevy cargado correctamente");
   } catch (error) {
     // Es normal ver el mensaje "Using exceptions for control flow" en la consola
-    if (!error.toString().includes("exceptions for control flow")) {
+    if (!error?.toString().includes("exceptions for control flow")) {
       console.error("Error real:", error);
     }
   }
