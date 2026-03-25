@@ -2,6 +2,7 @@
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
 export const run_app: () => void;
+export const load_map_image: (a: number, b: number, c: number, d: number) => void;
 export const wgpu_render_pass_draw: (a: number, b: number, c: number, d: number, e: number) => void;
 export const wgpu_render_pass_draw_indexed: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
 export const wgpu_render_pass_set_pipeline: (a: number, b: bigint) => void;

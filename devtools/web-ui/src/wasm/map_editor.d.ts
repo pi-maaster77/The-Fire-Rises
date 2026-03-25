@@ -1,6 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export function load_map_image(data: Uint8Array, width: number, height: number): void;
+
 export function run_app(): void;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -8,6 +10,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly run_app: () => void;
+    readonly load_map_image: (a: number, b: number, c: number, d: number) => void;
     readonly wgpu_render_pass_draw: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly wgpu_render_pass_draw_indexed: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
     readonly wgpu_render_pass_set_pipeline: (a: number, b: bigint) => void;

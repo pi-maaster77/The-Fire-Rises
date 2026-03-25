@@ -2,3 +2,5 @@
 
 pub mod setup;
 pub mod interactions;
+pub mod scanner;
+pub mod render;

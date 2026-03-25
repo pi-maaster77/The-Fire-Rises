@@ -2,3 +2,4 @@
 
 pub mod setup;
 pub mod interactions;
+pub mod image_processing;

@@ -1,63 +1,44 @@
-// frontend/map/src/bridge/mod.rs
+// devtools/map-editor/src/bridge/mod.rs
 
 use bevy::prelude::*;
 use wasm_bindgen::prelude::*;
-use serde::Serialize;
+use std::sync::Mutex;
+use serde_json;
+use crate::map::components::{MapImage, ProvincePixelMap};
 
-use crate::map::components::Province;
+static MAP_IMAGE_DATA: Mutex<Option<(Vec<u8>, u32, u32)>> = Mutex::new(None);
+
+#[derive(Resource)]
+pub struct ScanTrigger;
+
+#[derive(Resource)]
+pub struct RenderUpdateTrigger;
 
 #[wasm_bindgen]
-extern "C" {
-    // Un solo punto de entrada en JS para todos los eventos
-    #[wasm_bindgen(js_name = __BEVY_BRIDGE_INBOUND__)]
-    fn send_to_js(event: JsValue);
+pub fn load_map_image(data: &[u8], width: u32, height: u32) {
+    *MAP_IMAGE_DATA.lock().unwrap() = Some((data.to_vec(), width, height));
 }
 
-#[derive(Serialize)]
-#[serde(tag = "type", content = "payload")]
-pub enum GameEvent {
-    #[serde(rename = "PROVINCE_SELECTED")]
-    ProvinceSelected { id: u32, state_id: u32 },
-    // Aquí irían ECONOMY_UPDATE, TICK, etc.
+pub fn send_to_vue(event_type: &str, payload: &serde_json::Value) {
+    let payload_str = serde_json::to_string(payload).unwrap();
+    let js_code = format!("if (window.__BEVY_BRIDGE_INBOUND__) {{ window.__BEVY_BRIDGE_INBOUND__({{type: '{}', payload: {}}}); }}", event_type, payload_str);
+    js_sys::eval(&js_code).unwrap();
 }
 
-pub struct BridgePlugin;
-
-impl Plugin for BridgePlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Update, handle_clicks);
-    }
-}
-
-fn handle_clicks(
-    mouse: Res<ButtonInput<MouseButton>>,
-    camera_q: Query<(&Camera, &GlobalTransform)>,
-    window_q: Query<&Window>,
-    provinces_q: Query<(&Province, &GlobalTransform, &Sprite)>,
+pub fn check_load_image(
+    mut commands: Commands,
+    mut map_image: Option<ResMut<MapImage>>,
+    mut pixel_map: Option<ResMut<ProvincePixelMap>>,
 ) {
-    if mouse.just_pressed(MouseButton::Left) {
-        let window = window_q.single();
-        let (camera, camera_transform) = camera_q.single();
-
-        if let Some(world_position) = window.cursor_position()
-            .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor)) 
-        {
-            for (prov, transform, sprite) in provinces_q.iter() {
-                let size = sprite.custom_size.unwrap_or(Vec2::ZERO) / 2.0;
-                let pos = transform.translation().truncate();
-                
-                // Detección de click simple (AABB)
-                if world_position.x > pos.x - size.x && world_position.x < pos.x + size.x &&
-                   world_position.y > pos.y - size.y && world_position.y < pos.y + size.y {
-                    
-                    // Enviamos el evento a Vue
-                    let event = GameEvent::ProvinceSelected { id: prov.id, state_id: prov.state_id };
-                    if let Ok(js_val) = serde_wasm_bindgen::to_value(&event) {
-                        send_to_js(js_val);
-                    }
-                    break;
-                }
-            }
+    if let Some((data, width, height)) = MAP_IMAGE_DATA.lock().unwrap().take() {
+        if let (Some(map_image), Some(pixel_map)) = (map_image.as_mut(), pixel_map.as_mut()) {
+            map_image.width = width;
+            map_image.height = height;
+            map_image.data = data;
+            pixel_map.width = width;
+            pixel_map.height = height;
+            pixel_map.data = vec![None; (width * height) as usize];
+            commands.insert_resource(ScanTrigger);
         }
     }
 }

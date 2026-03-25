@@ -1,25 +1,25 @@
-// frontend/map/src/map/components.rs
+// devtools/map-editor/src/map/components.rs
 
 use bevy::prelude::*;
 use serde::Serialize;
 
 #[derive(Component, Serialize, Clone)]
 pub struct Province {
-    pub id: u32,
-    pub coords: (i32, i32),
-    pub state_id: u32,
+    pub id: String,
+    pub center: Vec2,
+    pub state_id: String,
 }
 
 #[derive(Component, Serialize, Clone)]
 pub struct State {
-    pub id: u32,
+    pub id: String,
     pub name: String,
-    pub region_id: u32,
+    pub region_id: String,
 }
 
 #[derive(Component, Serialize, Clone)]
 pub struct Region {
-    pub id: u32,
+    pub id: String,
     pub name: String,
 }
 
@@ -30,3 +30,20 @@ pub struct Selected;
 pub struct StateBorder {
     pub state_id: u32,
 }
+
+#[derive(Resource)]
+pub struct MapImage {
+    pub width: u32,
+    pub height: u32,
+    pub data: Vec<u8>, // RGBA
+}
+
+#[derive(Resource)]
+pub struct ProvincePixelMap {
+    pub width: u32,
+    pub height: u32,
+    pub data: Vec<Option<String>>, // province id per pixel
+}
+
+#[derive(Component)]
+pub struct MapSprite;

@@ -17,7 +17,7 @@ extern "C" {
 #[serde(tag = "type", content = "payload")]
 pub enum GameEvent {
     #[serde(rename = "PROVINCE_SELECTED")]
-    ProvinceSelected { id: u32, state_id: u32 },
+    ProvinceSelected { id: u32, state_id: String },
     // Aquí irían ECONOMY_UPDATE, TICK, etc.
 }
 

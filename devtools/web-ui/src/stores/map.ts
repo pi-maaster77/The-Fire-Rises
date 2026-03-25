@@ -6,5 +6,6 @@ export const useMapStore = defineStore('map', {
   state: () => ({
     selectedProvince: null as any,
     selectedState: null as any,
+    provinces: [] as string[],
   }),
 });
