@@ -2,6 +2,7 @@
 members = [
     "backend",
     "frontend/map",
+		"devtools/map-editor",
     "shared", # Si decidiste crear la carpeta shared
 ]
 resolver = "2"
