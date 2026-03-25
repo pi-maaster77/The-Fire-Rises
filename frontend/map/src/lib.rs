@@ -1,57 +1,98 @@
 // frontend/map/src/lib.rs
 
 use bevy::prelude::*;
-use wasm_bindgen::prelude::*;
-use js_sys::Reflect; // Necesario para manipular propiedades de JS
+use wasm_bindgen::prelude::wasm_bindgen;
 
-#[derive(Resource, Default)]
-struct GlobalCounter(u32);
+#[derive(Resource)]
+pub struct Counter(pub i32);
 
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = ["window", "__BEVY_BRIDGE__"])]
-    fn on_bevy_counter_update(val: u32);
+#[derive(Component)]
+pub struct CounterText;
+
+#[wasm_bindgen(start)]
+pub fn run_app() {
+    App::new()
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                // El ID debe coincidir con el <canvas id="canvas">
+                canvas: Some("#canvas".into()),
+                // Evita que el navegador use el scroll al tocar el canvas
+                prevent_default_event_handling: true,
+                ..default()
+            }),
+            ..default()
+        }))
+        .insert_resource(ClearColor(Color::rgb(0.2, 0.2, 0.2))) // Fondo gris oscuro
+        .insert_resource(Counter(0))
+        .add_systems(Startup, setup)
+        .add_systems(Update, (handle_input, handle_button_click, update_ui))
+        .run();
 }
 
-#[wasm_bindgen]
-pub fn send_to_bevy(val: u32) {
-    let window = web_sys::window().expect("no global `window` exists");
-    // Correcto: usamos Reflect para escribir en window.next_counter_val
-    let key = JsValue::from_str("next_counter_val");
-    let value = JsValue::from_f64(val as f64);
-    Reflect::set(&window, &key, &value).expect("failed to set window property");
+fn setup(mut commands: Commands) {
+    commands.spawn(Camera2dBundle::default());
+
+    // Texto del contador
+    commands.spawn((
+        TextBundle::from_section(
+            "Contador: 0",
+            TextStyle { font_size: 60.0, color: Color::WHITE, ..default() },
+        ).with_style(Style {
+            position_type: PositionType::Absolute,
+            top: Val::Px(20.0),
+            left: Val::Px(20.0),
+            ..default()
+        }),
+        CounterText,
+    ));
+
+    // Botón
+    commands.spawn(ButtonBundle {
+        style: Style {
+            width: Val::Px(80.0),
+            height: Val::Px(80.0),
+            position_type: PositionType::Absolute,
+            bottom: Val::Px(50.0),
+            right: Val::Px(50.0),
+            justify_content: JustifyContent::Center,
+            align_items: AlignItems::Center,
+            ..default()
+        },
+        background_color: BackgroundColor(Color::rgb(0.2, 0.6, 0.2)),
+        ..default()
+    })
+    .with_children(|parent| {
+        parent.spawn(TextBundle::from_section(
+            "+",
+            TextStyle { font_size: 40.0, color: Color::WHITE, ..default() },
+        ));
+    });
 }
 
-pub struct MapPlugin;
+// --- SISTEMAS DE LÓGICA ---
 
-impl Plugin for MapPlugin {
-    fn build(&self, app: &mut App) {
-        app.init_resource::<GlobalCounter>()
-           .add_systems(Update, (read_js_updates, sync_to_vue));
-    }
+fn handle_input(keyboard: Res<ButtonInput<KeyCode>>, mut counter: ResMut<Counter>) {
+    if keyboard.just_pressed(KeyCode::Space) { counter.0 += 1; }
 }
 
-fn read_js_updates(mut counter: ResMut<GlobalCounter>) {
-    let window = web_sys::window().unwrap();
-    let key = JsValue::from_str("next_counter_val");
-    
-    // Reflect::get devuelve un Result<JsValue, JsValue>
-    if let Ok(val) = Reflect::get(&window, &key) {
-        if !val.is_null() && !val.is_undefined() {
-            if let Some(num) = val.as_f64() {
-                let new_val = num as u32;
-                if counter.0 != new_val {
-                    counter.0 = new_val;
-                    // Limpiamos el buzón seteándolo a null
-                    Reflect::set(&window, &key, &JsValue::NULL).unwrap();
-                }
-            }
+fn update_ui(counter: Res<Counter>, mut query: Query<&mut Text, With<CounterText>>) {
+    if counter.is_changed() {
+        for mut text in &mut query {
+            text.sections[0].value = format!("Contador: {}", counter.0);
         }
     }
 }
 
-fn sync_to_vue(counter: Res<GlobalCounter>) {
-    if counter.is_changed() {
-        on_bevy_counter_update(counter.0);
+fn handle_button_click(
+    mut interaction_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<Button>)>,
+    mut counter: ResMut<Counter>,
+) {
+    for (interaction, mut color) in &mut interaction_query {
+        if *interaction == Interaction::Pressed {
+            counter.0 += 1;
+            *color = BackgroundColor(Color::rgb(0.4, 0.8, 0.4));
+        } else {
+            *color = BackgroundColor(Color::rgb(0.2, 0.6, 0.2));
+        }
     }
 }
