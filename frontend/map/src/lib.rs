@@ -2,6 +2,9 @@
 
 use bevy::prelude::*;
 use wasm_bindgen::prelude::wasm_bindgen;
+use std::sync::Mutex;
+use once_cell::sync::Lazy;
+static JS_COMMANDS: Lazy<Mutex<Vec<i32>>> = Lazy::new(|| Mutex::new(Vec::new()));
 
 #[derive(Resource)]
 pub struct Counter(pub i32);
@@ -25,8 +28,23 @@ pub fn run_app() {
         .insert_resource(ClearColor(Color::rgb(0.2, 0.2, 0.2))) // Fondo gris oscuro
         .insert_resource(Counter(0))
         .add_systems(Startup, setup)
-        .add_systems(Update, (handle_input, handle_button_click, update_ui))
+        .add_systems(Update, (handle_input, handle_button_click, update_ui, sync_with_js_system))
         .run();
+}
+
+// Función para que JS incremente el contador
+#[wasm_bindgen]
+pub fn send_increment_to_rust(amount: i32) {
+    if let Ok(mut commands) = JS_COMMANDS.lock() {
+        commands.push(amount);
+    }
+}
+
+#[wasm_bindgen]
+extern "C" {
+    // Esto le dice a Rust que existe una función en JS llamada así
+    #[wasm_bindgen(js_name = updateVueCounter)]
+    fn update_vue_counter(value: i32);
 }
 
 fn setup(mut commands: Commands) {
@@ -75,11 +93,15 @@ fn handle_input(keyboard: Res<ButtonInput<KeyCode>>, mut counter: ResMut<Counter
     if keyboard.just_pressed(KeyCode::Space) { counter.0 += 1; }
 }
 
+// Modificamos el sistema de UI de Rust para que avise a JS
 fn update_ui(counter: Res<Counter>, mut query: Query<&mut Text, With<CounterText>>) {
     if counter.is_changed() {
+        // 1. Actualizamos el texto en el motor (Bevy)
         for mut text in &mut query {
             text.sections[0].value = format!("Contador: {}", counter.0);
         }
+        // 2. LLAMAMOS A VUE
+        update_vue_counter(counter.0);
     }
 }
 
@@ -93,6 +115,15 @@ fn handle_button_click(
             *color = BackgroundColor(Color::rgb(0.4, 0.8, 0.4));
         } else {
             *color = BackgroundColor(Color::rgb(0.2, 0.6, 0.2));
+        }
+    }
+}
+
+fn sync_with_js_system(mut counter: ResMut<Counter>) {
+    if let Ok(mut commands) = JS_COMMANDS.lock() {
+        for amount in commands.drain(..) {
+            counter.0 += amount;
+            info!("Contador incrementado desde JS en: {}", amount);
         }
     }
 }
