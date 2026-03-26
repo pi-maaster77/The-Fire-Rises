@@ -76,12 +76,6 @@ pub struct SelectedProvinceId(pub Option<String>);
 #[derive(Resource, Default)]
 pub struct ProvinceStateMap(pub HashMap<String, String>);
 
-#[derive(Resource, Default)]
-pub struct BrushSettings {
-    pub active_state_id: Option<String>,
-    pub is_painting: bool,
-}
-
 // ======================================================
 // 🎥 CAMERA CONFIG
 // ======================================================

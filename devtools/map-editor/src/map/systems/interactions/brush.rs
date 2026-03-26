@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use wasm_bindgen::prelude::wasm_bindgen;
-use crate::{bridge::systems::selection::RenderUpdateTrigger, map::components::{BrushSettings, ProvincePixelMap, ProvinceStateMap}};
+use crate::{bridge::systems::selection::RenderUpdateTrigger, map::components::{ProvincePixelMap, ProvinceStateMap}};
 
 pub fn brush_system(
     mut commands: Commands,
@@ -44,4 +44,10 @@ pub fn brush_system(
 unsafe extern "C" {
     #[wasm_bindgen(js_name = onProvinceAssigned)]
     fn on_province_assigned(prov_id: String, state_id: String);
+}
+
+#[derive(Resource, Default)]
+pub struct BrushSettings {
+    pub active_state_id: Option<String>,
+    pub is_painting: bool,
 }
