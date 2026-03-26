@@ -1,8 +1,7 @@
 // devtools/map-editor/src/map/systems/scanner.rs
 
 use bevy::prelude::*;
-use crate::map::components::{Province, MapImage, ProvincePixelMap};
-use crate::bridge::{ScanTrigger, RenderUpdateTrigger, send_to_vue};
+use crate::{bridge::{outbound::send_to_vue, systems::{load_image::ScanTrigger, selection::RenderUpdateTrigger}}, map::components::{MapImage, Province, ProvincePixelMap}};
 use serde_json::json;
 
 pub fn scanner_system(

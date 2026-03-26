@@ -12,12 +12,8 @@ use self::systems::scanner::scanner_system;
 use self::systems::interactions::handle_click;
 use self::systems::render::render_map_sprite;
 use crate::{
-	bridge::{
-		ScanTrigger, 
-		check_external_selection, 
-		check_load_image
-	}, 
-	map::systems::setup::handle_window_resize
+	bridge::systems::{load_image::{ScanTrigger, check_load_image}, selection::check_external_selection}, 
+	map::systems::{interactions::brush::brush_system, setup::handle_window_resize}
 };
 
 pub struct MapPlugin;
@@ -32,7 +28,8 @@ impl Plugin for MapPlugin {
 					handle_click, 
 					render_map_sprite,
 					check_external_selection,
-					handle_window_resize
+					handle_window_resize,
+					brush_system
 				));
     }
 }

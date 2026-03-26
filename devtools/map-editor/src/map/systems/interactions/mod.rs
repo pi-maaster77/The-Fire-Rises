@@ -2,11 +2,14 @@
 
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+use crate::bridge::outbound::send_to_vue;
+use crate::bridge::systems::selection::RenderUpdateTrigger;
 use crate::map::components::{Province, ProvincePixelMap, Selected, SelectedProvinceId};
-use crate::bridge::{send_to_vue, RenderUpdateTrigger};
 use serde_json::json;
 use bevy::render::camera::Camera;
 use bevy::transform::components::GlobalTransform;
+
+pub mod brush;
 
 pub fn handle_click(
     mut commands: Commands,
