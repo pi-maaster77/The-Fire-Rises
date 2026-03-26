@@ -61,11 +61,6 @@ const handleFileUpload = async (event: Event) => {
   };
   img.src = URL.createObjectURL(file);
 };
-
-const acceptMap = () => {
-  alert('Mapa aceptado!'); // Placeholder
-  // Aquí podrías enviar un evento a Bevy o manejar la lógica
-};
 </script>
 
 <template>
@@ -81,10 +76,6 @@ const acceptMap = () => {
         <div v-if="isLoading" class="loading">
           <p>Cargando mapa...</p>
           <div class="spinner"></div>
-        </div>
-        <div v-else-if="mapStore.provinces.length > 0" class="map-ready">
-          <p>Mapa cargado con {{ mapStore.provinces.length }} provincias</p>
-          <button @click="acceptMap">Aceptar Mapa</button>
         </div>
         <div v-if="mapStore.selectedProvince">
           <h4>Provincia Seleccionada:</h4>
