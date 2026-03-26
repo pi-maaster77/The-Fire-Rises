@@ -12,3 +12,17 @@ pub fn sync_brush_settings(mut brush_res: ResMut<BrushSettings>) {
         }
     }
 }
+
+// src/bridge/systems/assignments.rs
+use crate::bridge::state::ACTIVE_REGION_UPDATE;
+use crate::map::components::ActiveRegionEditing;
+
+pub fn sync_region_settings(
+    mut active_region: ResMut<ActiveRegionEditing>,
+) {
+    if let Ok(mut guard) = ACTIVE_REGION_UPDATE.lock() {
+        if let Some(new_id) = guard.take() {
+            active_region.id = new_id;
+        }
+    }
+}

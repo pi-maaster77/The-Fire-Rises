@@ -49,6 +49,7 @@ pub fn scanner_system(
                 id: id.clone(),
                 center,
                 state_id: "STATE_001".to_string(), // placeholder
+								region_id: None,
             });
             province_ids.push(id);
             province_counter += 1;

@@ -15,6 +15,7 @@ pub struct Province {
     pub id: String,
     pub center: Vec2,
     pub state_id: String,
+		pub region_id: Option<String>
 }
 
 #[allow(dead_code)]
@@ -30,6 +31,12 @@ pub struct State {
 pub struct Region {
     pub id: String,
     pub name: String,
+}
+
+#[allow(dead_code)]
+#[derive(Resource, Default)]
+pub struct ActiveRegionEditing {
+    pub id: Option<String>,
 }
 
 // ======================================================

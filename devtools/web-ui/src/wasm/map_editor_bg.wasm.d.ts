@@ -4,6 +4,7 @@ export const memory: WebAssembly.Memory;
 export const assign_province_to_state: (a: number, b: number, c: number, d: number) => void;
 export const load_map_image: (a: number, b: number, c: number, d: number) => void;
 export const select_province_by_id: (a: number, b: number) => void;
+export const set_active_region: (a: number, b: number) => void;
 export const update_brush_settings: (a: number, b: number, c: number) => void;
 export const run_app: () => void;
 export const wgpu_render_pass_draw: (a: number, b: number, c: number, d: number, e: number) => void;

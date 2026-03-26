@@ -1,6 +1,7 @@
 <!-- devtools/web-ui/src/components/layout/RightSidePanel.vue -->
 
 <script setup lang="ts">
+import RegionPanel from '../domain/RegionPanel.vue';
 import StateCreator from '../domain/StateCreator.vue';
 import StateSelector from '../domain/StateSelector.vue';
 
@@ -13,6 +14,7 @@ import StateSelector from '../domain/StateSelector.vue';
     <h3>Herramientas</h3>
 		<StateSelector />
 		<StateCreator/>
+		<RegionPanel/>
   </div>
 </template>
 

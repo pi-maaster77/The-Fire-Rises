@@ -11,4 +11,5 @@ pub static BRUSH_UPDATE: Lazy<Mutex<Option<(bool, Option<String>)>>> = Lazy::new
 
 lazy_static! {
     pub static ref EXTERNAL_SELECTION: Mutex<Option<String>> = Mutex::new(None);
+		pub static ref ACTIVE_REGION_UPDATE: Mutex<Option<Option<String>>> = Mutex::new(None);
 }

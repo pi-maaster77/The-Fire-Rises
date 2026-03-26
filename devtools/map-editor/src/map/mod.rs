@@ -11,7 +11,7 @@ use self::systems::setup::spawn_map;
 use self::systems::scanner::scanner_system;
 use self::systems::render::render_map_sprite;
 use crate::{
-	bridge::systems::{assignments::sync_brush_settings, load_image::{ScanTrigger, check_load_image}, selection::check_external_selection}, 
+	bridge::systems::{assignments::{sync_brush_settings, sync_region_settings}, load_image::{ScanTrigger, check_load_image}, selection::check_external_selection}, 
 	map::systems::{camera::camera_control_system, interactions::InteractionsPlugin, setup::handle_window_resize}
 };
 
@@ -23,6 +23,7 @@ impl Plugin for MapPlugin {
         app
 				.init_resource::<components::ProvinceStateMap>() 
 				.init_resource::<components::CameraConfig>()
+				.init_resource::<components::ActiveRegionEditing>()
 				.add_systems(Startup, spawn_map)
         .add_systems(Update, (
 					check_load_image, 
@@ -31,6 +32,7 @@ impl Plugin for MapPlugin {
 					check_external_selection,
 					handle_window_resize,
 					sync_brush_settings,
+					sync_region_settings,
 					camera_control_system,
 				))
 				.add_plugins(InteractionsPlugin);

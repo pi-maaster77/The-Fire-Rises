@@ -1,7 +1,7 @@
 // devtools/map-editor/src/bridge/inbound.rs
 
 use wasm_bindgen::prelude::wasm_bindgen;
-use crate::bridge::state::{BRUSH_UPDATE, EXTERNAL_SELECTION, MAP_IMAGE_DATA, STATE_ASSIGNMENTS};
+use crate::bridge::state::{ACTIVE_REGION_UPDATE, BRUSH_UPDATE, EXTERNAL_SELECTION, MAP_IMAGE_DATA, STATE_ASSIGNMENTS};
 
 #[wasm_bindgen]
 pub fn load_map_image(data: &[u8], width: u32, height: u32) {
@@ -26,5 +26,12 @@ pub fn assign_province_to_state(province_id: String, state_id: String) {
 pub fn update_brush_settings(active: bool, state_id: Option<String>) {
     if let Ok(mut brush) = BRUSH_UPDATE.lock() {
         *brush = Some((active, state_id));
+    }
+}
+
+#[wasm_bindgen]
+pub fn set_active_region(region_id: Option<String>) {
+    if let Ok(mut guard) = ACTIVE_REGION_UPDATE.lock() {
+        *guard = Some(region_id);
     }
 }
