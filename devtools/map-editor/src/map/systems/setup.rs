@@ -5,7 +5,7 @@ use bevy::{
 	ecs::system::Commands, 
 
 };
-use crate::map::components::{MapImage, ProvincePixelMap};
+use crate::map::components::{MapImage, ProvincePixelMap, SelectedProvinceId};
 
 pub fn spawn_map(mut commands: Commands) {
     commands.insert_resource(MapImage {
@@ -18,4 +18,5 @@ pub fn spawn_map(mut commands: Commands) {
         height: 0,
         data: vec![],
     });
+		commands.insert_resource(SelectedProvinceId(None));
 }

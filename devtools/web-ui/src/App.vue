@@ -6,6 +6,7 @@ import init, { load_map_image } from './wasm/map_editor.js';
 import wasmUrl from './wasm/map_editor_bg.wasm?url';
 import { setupBridge } from './wasm/bridge.js';
 import { useMapStore } from './stores/map.js';
+import SelectProvince from './components/domain/SelectProvince.vue';
 
 const mapStore = useMapStore();
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -90,6 +91,9 @@ const acceptMap = () => {
           <p>ID: {{ mapStore.selectedProvince.id }}</p>
           <p>Centro: {{ mapStore.selectedProvince.center }}</p>
         </div>
+				<div v-if="mapStore.provinces">
+					<SelectProvince/>
+				</div>
       </div>
     </div>
     <div class="canvas-container">

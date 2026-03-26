@@ -5,12 +5,15 @@ export function load_map_image(data: Uint8Array, width: number, height: number):
 
 export function run_app(): void;
 
+export function select_province_by_id(id: string): void;
+
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
-    readonly run_app: () => void;
     readonly load_map_image: (a: number, b: number, c: number, d: number) => void;
+    readonly select_province_by_id: (a: number, b: number) => void;
+    readonly run_app: () => void;
     readonly wgpu_render_pass_draw: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly wgpu_render_pass_draw_indexed: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
     readonly wgpu_render_pass_set_pipeline: (a: number, b: bigint) => void;

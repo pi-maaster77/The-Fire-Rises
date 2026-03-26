@@ -4,9 +4,13 @@ use bevy::prelude::*;
 use wasm_bindgen::prelude::*;
 use std::sync::Mutex;
 use serde_json;
-use crate::map::components::{MapImage, ProvincePixelMap};
+use crate::map::components::{MapImage, ProvincePixelMap, SelectedProvinceId};
+use lazy_static::lazy_static; // Asegurate de tener esta crate o usá Mutex::new(None) directamente
 
 static MAP_IMAGE_DATA: Mutex<Option<(Vec<u8>, u32, u32)>> = Mutex::new(None);
+lazy_static! {
+    static ref EXTERNAL_SELECTION: Mutex<Option<String>> = Mutex::new(None);
+}
 
 #[derive(Resource)]
 pub struct ScanTrigger;
@@ -17,6 +21,13 @@ pub struct RenderUpdateTrigger;
 #[wasm_bindgen]
 pub fn load_map_image(data: &[u8], width: u32, height: u32) {
     *MAP_IMAGE_DATA.lock().unwrap() = Some((data.to_vec(), width, height));
+}
+
+#[wasm_bindgen]
+pub fn select_province_by_id(id: String) {
+    if let Ok(mut guard) = EXTERNAL_SELECTION.lock() {
+        *guard = Some(id);
+    }
 }
 
 pub fn send_to_vue(event_type: &str, payload: &serde_json::Value) {
@@ -39,6 +50,19 @@ pub fn check_load_image(
             pixel_map.height = height;
             pixel_map.data = vec![None; (width * height) as usize];
             commands.insert_resource(ScanTrigger);
+        }
+    }
+}
+
+pub fn check_external_selection(
+    mut commands: Commands,
+    mut selected_res: ResMut<SelectedProvinceId>,
+) {
+    if let Ok(mut guard) = EXTERNAL_SELECTION.lock() {
+        if let Some(id) = guard.take() {
+            // Actualizamos el recurso y disparamos el repintado (el borde dorado)
+            selected_res.0 = Some(id);
+            commands.insert_resource(RenderUpdateTrigger);
         }
     }
 }

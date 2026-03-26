@@ -3,6 +3,8 @@
 use bevy::prelude::*;
 use wasm_bindgen::prelude::wasm_bindgen;
 
+use crate::bridge::check_external_selection;
+
 mod map;
 mod bridge; // Comunicación con JS
 
@@ -22,7 +24,7 @@ pub fn run_app() {
         // Nuestros Plugins personalizados (Escalabilidad)
         .add_plugins(map::MapPlugin)
         .add_systems(Startup, setup_camera)
-        
+				.add_systems(Update, check_external_selection)
         .run();
 }
 

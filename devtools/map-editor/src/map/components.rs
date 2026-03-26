@@ -47,3 +47,7 @@ pub struct ProvincePixelMap {
 
 #[derive(Component)]
 pub struct MapSprite;
+
+// map/components.rs
+#[derive(Resource, Default)]
+pub struct SelectedProvinceId(pub Option<String>);
