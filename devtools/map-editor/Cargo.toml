@@ -1,6 +1,6 @@
 [package]
 name = "map-editor"
-version = "0.1.0"
+version = "0.2.0" # Actualizacion. En la herramienta del juego de pintar mapitas, ya se pueden pintar mapitas
 edition = "2021"
 
 [lib]

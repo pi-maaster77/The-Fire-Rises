@@ -13,6 +13,7 @@ pub struct Province {
     pub state_id: String,
 }
 
+#[allow(dead_code)]
 #[derive(Component, Serialize, Clone)]
 pub struct State {
     pub id: String,
@@ -20,6 +21,7 @@ pub struct State {
     pub region_id: String,
 }
 
+#[allow(dead_code)]
 #[derive(Component, Serialize, Clone)]
 pub struct Region {
     pub id: String,
@@ -29,6 +31,7 @@ pub struct Region {
 #[derive(Component)]
 pub struct Selected;
 
+#[allow(dead_code)]
 #[derive(Component)]
 pub struct StateBorder {
     pub state_id: u32,

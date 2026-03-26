@@ -1,4 +1,4 @@
-// frontend/web-ui/src/main.ts
+// devtools/web-ui/src/main.ts
 
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';

@@ -12,7 +12,7 @@ use self::systems::scanner::scanner_system;
 use self::systems::interactions::handle_click;
 use self::systems::render::render_map_sprite;
 use crate::{
-	bridge::systems::{load_image::{ScanTrigger, check_load_image}, selection::check_external_selection}, 
+	bridge::systems::{assignments::sync_brush_settings, load_image::{ScanTrigger, check_load_image}, selection::check_external_selection}, 
 	map::systems::{interactions::brush::brush_system, setup::handle_window_resize}
 };
 
@@ -21,15 +21,19 @@ pub struct MapPlugin;
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         // Aquí es donde le decimos a Bevy que use la función
-        app.add_systems(Startup, spawn_map);
-        app.add_systems(Update, (
+        app
+				.init_resource::<components::ProvinceStateMap>() 
+        .init_resource::<components::BrushSettings>()
+				.add_systems(Startup, spawn_map)
+        .add_systems(Update, (
 					check_load_image, 
 					scanner_system.run_if(resource_exists::<ScanTrigger>), 
 					handle_click, 
 					render_map_sprite,
 					check_external_selection,
 					handle_window_resize,
-					brush_system
+					brush_system,
+					sync_brush_settings,
 				));
     }
 }

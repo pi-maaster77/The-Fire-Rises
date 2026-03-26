@@ -6,7 +6,7 @@ use serde_json::json;
 
 pub fn scanner_system(
     mut commands: Commands,
-    mut scan_trigger: ResMut<ScanTrigger>,
+    _scan_trigger: ResMut<ScanTrigger>,
     map_image: Res<MapImage>,
     mut pixel_map: ResMut<ProvincePixelMap>,
 ) {

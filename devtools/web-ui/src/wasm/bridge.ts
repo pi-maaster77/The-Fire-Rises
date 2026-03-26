@@ -1,7 +1,7 @@
-// frontend/web-ui/src/wasm/bridge.ts
+// devtools/web-ui/src/wasm/bridge.ts
 import { useMapStore } from '../stores/map'
-
-
+// devtools/web-ui/src/wasm/bridge.js (o donde tengas tus exportaciones)
+import { update_brush_settings } from './map_editor.js';
 
 // Definimos la estructura de los mensajes para tener autocompletado (IntelliSense)
 export type InboundEvent = 
@@ -26,3 +26,5 @@ export function setupBridge() {
     }
   };
 }
+
+export { update_brush_settings };

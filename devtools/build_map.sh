@@ -3,7 +3,7 @@
 #!/bin/bash
 # Compilar Rust a WASM
 cd map-editor
-wasm-pack build --target web --out-dir ../web-ui/src/wasm/
+wasm-pack build --target web --dev --out-dir ../web-ui/src/wasm/
 
 # Limpiar archivos innecesarios que genera wasm-pack
 rm ../web-ui/src/wasm/.gitignore

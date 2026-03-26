@@ -25,10 +25,10 @@ pub fn handle_window_resize(
     mut resize_reader: EventReader<WindowResized>,
     mut query_camera: Query<&mut Transform, With<Camera2d>>,
 ) {
-    for e in resize_reader.read() {
+    for _e in resize_reader.read() {
         // Cuando el canvas de JS cambia de tamaño, 
         // Bevy recibe este evento automáticamente.
-        if let Ok(mut transform) = query_camera.get_single_mut() {
+        if let Ok(_transform) = query_camera.get_single_mut() {
             // Opcional: Podés ajustar el zoom de la cámara aquí 
             // para que el mapa siempre quepa entero.
         }

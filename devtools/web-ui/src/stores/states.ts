@@ -28,6 +28,17 @@ export const useStatesStore = defineStore('states', {
       // 2. Avisar a Rust para que repinte el mapa con el color del estado
       // Pasamos la provincia y el ID del estado
       assign_province_to_state(this.selectedProvinceId, stateId);
-    }
+    },
+				// Esta es la función que llamarás desde tu componente de Vue
+		selectFromUI(id: string) {
+			// 1. Le avisamos a Rust para que el mapa se pinte dorado
+			select_province_by_id(id);
+			
+			// 2. Actualizamos el estado local de Vue
+			this.selectedProvinceId = id;
+		},
+		addState(id:string, name:string){
+			this.states.push({id, name, provinces:[]});
+		}
   }
 });
