@@ -9,11 +9,19 @@ import { setupBridge } from '../../wasm/bridge.js';
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
 onMounted(async () => {
-  if (canvasRef.value) {
-    const canvas = canvasRef.value;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-  }
+	const resizeCanvas = () => {
+    if (canvasRef.value) {
+      const canvas = canvasRef.value;
+      // Usamos getBoundingClientRect para obtener el tamaño real en píxeles
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+  };
+  
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
 
   setupBridge();
 
@@ -32,13 +40,13 @@ onMounted(async () => {
   <canvas id="canvas" ref="canvasRef"></canvas>
 </template>
 
-<style>
+<style scoped>
 #canvas {
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100vw;
+  left: 20vw;
+  width: 80vw;  /* Cambiado de 100vw a 80vw */
   height: 100vh;
-	z-index: -1;
+  display: block;
 }
 </style>
