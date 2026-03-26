@@ -1,10 +1,14 @@
 // devtools/map-editor/src/map/components.rs
 
 use bevy::{
-	prelude::*,
-	utils::HashMap
+    prelude::*,
+    utils::HashMap
 };
 use serde::Serialize;
+
+// ======================================================
+// 🗺️ MAP DOMAIN (Provinces / States / Regions)
+// ======================================================
 
 #[derive(Component, Serialize, Clone)]
 pub struct Province {
@@ -28,6 +32,10 @@ pub struct Region {
     pub name: String,
 }
 
+// ======================================================
+// 🏷️ TAG COMPONENTS (markers, sin datos complejos)
+// ======================================================
+
 #[derive(Component)]
 pub struct Selected;
 
@@ -36,6 +44,13 @@ pub struct Selected;
 pub struct StateBorder {
     pub state_id: u32,
 }
+
+#[derive(Component)]
+pub struct MapSprite;
+
+// ======================================================
+// 🖼️ MAP RESOURCES (datos pesados del mapa)
+// ======================================================
 
 #[derive(Resource)]
 pub struct MapImage {
@@ -51,10 +66,10 @@ pub struct ProvincePixelMap {
     pub data: Vec<Option<String>>, // province id per pixel
 }
 
-#[derive(Component)]
-pub struct MapSprite;
+// ======================================================
+// 🧠 EDITOR STATE (estado interno del editor)
+// ======================================================
 
-// map/components.rs
 #[derive(Resource, Default)]
 pub struct SelectedProvinceId(pub Option<String>);
 
@@ -66,6 +81,10 @@ pub struct BrushSettings {
     pub active_state_id: Option<String>,
     pub is_painting: bool,
 }
+
+// ======================================================
+// 🎥 CAMERA CONFIG
+// ======================================================
 
 #[derive(Resource)]
 pub struct CameraConfig {
@@ -79,7 +98,7 @@ impl Default for CameraConfig {
         Self {
             move_speed: 500.0,
             zoom_speed: 0.1,
-            pan_button: MouseButton::Right, // Paneo con click derecho
+            pan_button: MouseButton::Right,
         }
     }
 }
