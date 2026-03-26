@@ -13,7 +13,7 @@ use self::systems::interactions::handle_click;
 use self::systems::render::render_map_sprite;
 use crate::{
 	bridge::systems::{assignments::sync_brush_settings, load_image::{ScanTrigger, check_load_image}, selection::check_external_selection}, 
-	map::systems::{interactions::brush::brush_system, setup::handle_window_resize}
+	map::systems::{camera::camera_control_system, interactions::brush::brush_system, setup::handle_window_resize}
 };
 
 pub struct MapPlugin;
@@ -24,6 +24,7 @@ impl Plugin for MapPlugin {
         app
 				.init_resource::<components::ProvinceStateMap>() 
         .init_resource::<components::BrushSettings>()
+				.init_resource::<components::CameraConfig>()
 				.add_systems(Startup, spawn_map)
         .add_systems(Update, (
 					check_load_image, 
@@ -34,6 +35,7 @@ impl Plugin for MapPlugin {
 					handle_window_resize,
 					brush_system,
 					sync_brush_settings,
+					camera_control_system,
 				));
     }
 }

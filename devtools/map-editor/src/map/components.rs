@@ -66,3 +66,20 @@ pub struct BrushSettings {
     pub active_state_id: Option<String>,
     pub is_painting: bool,
 }
+
+#[derive(Resource)]
+pub struct CameraConfig {
+    pub move_speed: f32,
+    pub zoom_speed: f32,
+    pub pan_button: MouseButton,
+}
+
+impl Default for CameraConfig {
+    fn default() -> Self {
+        Self {
+            move_speed: 500.0,
+            zoom_speed: 0.1,
+            pan_button: MouseButton::Right, // Paneo con click derecho
+        }
+    }
+}
