@@ -1,6 +1,9 @@
 // devtools/map-editor/src/map/components.rs
 
-use bevy::prelude::*;
+use bevy::{
+	prelude::*,
+	utils::HashMap
+};
 use serde::Serialize;
 
 #[derive(Component, Serialize, Clone)]
@@ -51,3 +54,6 @@ pub struct MapSprite;
 // map/components.rs
 #[derive(Resource, Default)]
 pub struct SelectedProvinceId(pub Option<String>);
+
+#[derive(Resource, Default)]
+pub struct ProvinceStateMap(pub HashMap<String, String>);

@@ -1,16 +1,18 @@
 // devtools/map-editor/src/bridge/mod.rs
 
 use bevy::prelude::*;
+use once_cell::sync::Lazy;
 use wasm_bindgen::prelude::*;
 use std::sync::Mutex;
 use serde_json;
-use crate::map::components::{MapImage, ProvincePixelMap, SelectedProvinceId};
+use crate::map::components::{MapImage, Province, ProvincePixelMap, SelectedProvinceId};
 use lazy_static::lazy_static; // Asegurate de tener esta crate o usá Mutex::new(None) directamente
 
 static MAP_IMAGE_DATA: Mutex<Option<(Vec<u8>, u32, u32)>> = Mutex::new(None);
 lazy_static! {
     static ref EXTERNAL_SELECTION: Mutex<Option<String>> = Mutex::new(None);
 }
+static STATE_ASSIGNMENTS: Lazy<Mutex<Vec<(String, String)>>> = Lazy::new(|| Mutex::new(Vec::new()));
 
 #[derive(Resource)]
 pub struct ScanTrigger;
@@ -27,6 +29,13 @@ pub fn load_map_image(data: &[u8], width: u32, height: u32) {
 pub fn select_province_by_id(id: String) {
     if let Ok(mut guard) = EXTERNAL_SELECTION.lock() {
         *guard = Some(id);
+    }
+}
+
+#[wasm_bindgen]
+pub fn assign_province_to_state(province_id: String, state_id: String) {
+    if let Ok(mut assignments) = STATE_ASSIGNMENTS.lock() {
+        assignments.push((province_id, state_id));
     }
 }
 
@@ -63,6 +72,23 @@ pub fn check_external_selection(
             // Actualizamos el recurso y disparamos el repintado (el borde dorado)
             selected_res.0 = Some(id);
             commands.insert_resource(RenderUpdateTrigger);
+        }
+    }
+}
+
+pub fn sync_state_assignments(
+    mut commands: Commands,
+    mut provinces: Query<&mut Province>,
+) {
+    if let Ok(mut assignments) = STATE_ASSIGNMENTS.lock() {
+        for (prov_id, state_id) in assignments.drain(..) {
+            for mut province in provinces.iter_mut() {
+                if province.id == prov_id {
+                    province.state_id = state_id.clone();
+                    // Trigger para repintar el mapa
+                    commands.insert_resource(RenderUpdateTrigger);
+                }
+            }
         }
     }
 }

@@ -42,11 +42,14 @@ onMounted(async () => {
 
 <style scoped>
 #canvas {
-  position: absolute;
-  top: 0;
-  left: 20vw;
-  width: 80vw;  /* Cambiado de 100vw a 80vw */
-  height: 100vh;
+	position: absolute;
+  /* Si el sidebar mide 20vw, el canvas debe medir el resto */
+  left: 20vw !important;
+	width: calc(100vw - 40vw) !important; 
+
+  height: 100vh !important; /* Probemos con tus 200px */
   display: block;
+  background-color: #111; /* Para ver dónde termina el canvas */
+	z-index: 999;
 }
 </style>

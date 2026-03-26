@@ -13,14 +13,14 @@ pub fn render_map_sprite(
     map_image: Res<MapImage>,
     pixel_map: Res<ProvincePixelMap>,
     selected_res: Res<SelectedProvinceId>, // Recurso con el ID actual
-    mut query: Query<Entity, With<MapSprite>>,
+    query: Query<Entity, With<MapSprite>>,
     render_trigger: Option<Res<RenderUpdateTrigger>>,
+	window_query: Query<&Window, With<bevy::window::PrimaryWindow>>,
 ) {
     // Si no hay datos de mapa todavía, no hacemos nada
-    if map_image.data.is_empty() || pixel_map.data.is_empty() {
-        return;
-    }
+    if map_image.data.is_empty() || pixel_map.data.is_empty() { return };
 
+		let Ok(window) = window_query.get_single() else { return };
     let should_render = if render_trigger.is_some() {
         commands.remove_resource::<RenderUpdateTrigger>();
         for entity in query.iter() {
@@ -67,7 +67,7 @@ pub fn render_map_sprite(
         }
 				
 
-        let image = Image::new(
+				let image = Image::new(
             Extent3d { width: pixel_map.width, height: pixel_map.height, depth_or_array_layers: 1 },
             TextureDimension::D2,
             data,
@@ -76,10 +76,15 @@ pub fn render_map_sprite(
         );
 
         let texture_handle = images.add(image);
+
+				let scale_x = window.width() / pixel_map.width as f32;
+        let scale_y = window.height() / pixel_map.height as f32;
+				let final_scale = scale_x.min(scale_y) * 0.9;
+
         commands.spawn((
             SpriteBundle {
                 texture: texture_handle,
-                transform: Transform::from_xyz(0.0, 0.0, 0.0),
+                transform: Transform::from_scale(Vec3::splat(final_scale)),
                 ..default()
             },
             MapSprite,

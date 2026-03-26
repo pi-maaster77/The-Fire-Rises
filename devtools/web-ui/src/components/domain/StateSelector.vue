@@ -1,7 +1,5 @@
 <!-- devtools/web-ui/src/components/domain/StateSelector.vue -->
 
-<!-- devtools/web-ui/src/components/domain/SelectProvince.vue -->
-
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useStatesStore } from '../../stores/states';
