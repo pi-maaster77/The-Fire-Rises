@@ -19,7 +19,7 @@ import { useStatesStore } from '../../stores/states';
 	const statesStore = useStatesStore();
 
 	function create(){
-		statesStore.addState(name.value, id.value)
+		statesStore.registerState(name.value, id.value)
 		name.value = ''
 		id.value = ''
 	}

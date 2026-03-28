@@ -1,38 +1,69 @@
 <!-- devtools/web-ui/src/components/domain/RegionPanel.vue -->
 
-<template>
-  <div class="region-panel">
-    <h3>Gestión de Regiones</h3>
-    
-    <button @click="store.createRegion('Nueva Región', '#ff0000')">
-      + Crear Región
-    </button>
-
-    <div class="region-list">
-      <div 
-        v-for="region in store.regions" 
-        :key="region.id"
-        :class="['region-item', { active: store.activeRegionId === region.id }]"
-        @click="store.setActiveRegion(region.id)"
-      >
-        <span class="color-dot" :style="{ backgroundColor: region.color }"></span>
-        {{ region.name }} ({{ region.stateIds.length }} estados)
-      </div>
-    </div>
-
-    <button v-if="store.activeRegionId" @click="store.setActiveRegion(null)">
-      Desactivar Modo Asignación
-    </button>
-  </div>
-</template>
-
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useRegionStore } from '../../stores/region';
-const store = useRegionStore();
+import { useStatesStore } from '../../stores/states';
+
+const regionStore = useRegionStore();
+const statesStore = useStatesStore();
+
+const regionName = ref("")
+const regionId = ref("")
+const regionColor = ref("#000000")
+
+const selectedStateId = ref("")
+
+
+function saveRegion(){
+	regionStore.createRegion(regionId.value, regionName.value, regionColor.value)
+	regionId.value, regionName.value, regionColor.value = ""
+}
+
+function assignState(){
+	regionStore.assignStateToRegion(selectedStateId.value)
+	selectedStateId.value = ""
+}
+
+function getTextColor(hex: string): string {
+  // quitar #
+  const c = hex.replace('#', '');
+
+  const r = parseInt(c.substring(0, 2), 16);
+  const g = parseInt(c.substring(2, 4), 16);
+  const b = parseInt(c.substring(4, 6), 16);
+
+  // fórmula de luminancia
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b);
+
+  return luminance > 186 ? '#000000' : '#FFFFFF';
+}
+
 </script>
 
-<style scoped>
-.region-item { padding: 8px; cursor: pointer; border: 1px solid #333; margin-top: 4px; }
-.region-item.active { border-color: #00ff00; background: #1a3a1a; }
-.color-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
-</style>
+<template>
+	<input type="text" placeholder="Nombre De Region" v-model="regionName">
+	<input type="text" placeholder="ID De Region" v-model="regionId">
+	<input type="color" v-model="regionColor">
+	<button @click="saveRegion">+</button>
+
+	<select name="" id="" v-model="regionStore.activeRegionId">
+		<option v-for="region in regionStore.regions" :key="region.id" :value="region.id">
+			<span :style="{
+				color: getTextColor(region.color),
+				background: region.color
+			}">
+			{{region.name}}
+			</span>
+		</option>
+	</select>
+
+	<ul>
+		<li v-for="stateId in regionStore.activeRegion?.stateIds" :key="stateId">{{ stateId }}{{ statesStore.getStateById(stateId)?.name }}</li>
+	</ul>
+
+	<select name="" id="" v-model="selectedStateId">
+		<option v-for="state in statesStore.states" :key="state.id" :value="state.id">{{ state.name }}</option>
+	</select>
+	<button @click="assignState">+</button>
+</template>

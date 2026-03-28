@@ -27,20 +27,19 @@ export const useRegionStore = defineStore('regions', {
   },
 
   actions: {
-    createRegion(name: string, color: string) {
-      const id = `reg_${Date.now()}`;
+    createRegion(id: string, name: string, color: string) {
       this.regions.push({ id, name, color, stateIds: [] });
       this.activeRegionId = id;
     },
 
     // 100% UI: No depende de clicks en el mapa
-    assignStateToRegion(stateId: string, regionId: string) {
+    assignStateToRegion(stateId: string) {
       // Un estado solo pertenece a una región
       this.regions.forEach(r => {
         r.stateIds = r.stateIds.filter(id => id !== stateId);
       });
 
-      const region = this.regions.find(r => r.id === regionId);
+      const region = this.regions.find(r => r.id === this.activeRegion?.id);
       if (region && !region.stateIds.includes(stateId)) {
         region.stateIds.push(stateId);
       }

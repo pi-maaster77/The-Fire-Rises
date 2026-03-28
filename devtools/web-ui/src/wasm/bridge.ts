@@ -1,6 +1,5 @@
 // devtools/web-ui/src/wasm/bridge.ts
 import { useMapStore } from '../stores/map'
-import { useRegionStore } from '../stores/region.js';
 // devtools/web-ui/src/wasm/bridge.js (o donde tengas tus exportaciones)
 import { update_brush_settings } from './map_editor.js';
 
@@ -29,13 +28,3 @@ export function setupBridge() {
 }
 
 export { update_brush_settings };
-
-// En el archivo donde manejás los mensajes de Bevy a JS:
-window.addEventListener('bevy_message', (event: any) => {
-  const { action, payload } = (event as CustomEvent).detail;
-
-  if (action === "STATE_ASSIGNED_TO_REGION") {
-    const regionStore = useRegionStore();
-    regionStore.addStateToRegion(payload.state_id, payload.region_id);
-  }
-});

@@ -15,29 +15,28 @@ export const useStatesStore = defineStore('states', {
   }),
   
   getters: {
-    // Getter para saber a qué estado pertenece la provincia seleccionada
     selectedProvinceState: (state) => {
       if (!state.selectedProvinceId) return null;
       return state.states.find(s => s.provinces.includes(state.selectedProvinceId!));
     },
-    // Lista de IDs de estados para los selectores de la UI
     allStateIds: (state) => state.states.map(s => s.id),
   },
 
   actions: {
-    // Centralizamos el registro de estados que Bevy descubre al escanear
+		getStateById(id: string) {
+      return this.states.find(s => s.id === id);
+    },
+
     registerState(id: string, name: string) {
       if (!this.states.find(s => s.id === id)) {
         this.states.push({ id, name, provinces: [] });
       }
     },
 
-    // Selección desde el mapa (Bevy -> Vue)
     setProvinceSelection(provinceId: string) {
       this.selectedProvinceId = provinceId;
     },
 
-    // Selección desde la UI (Vue -> Rust)
     selectFromUI(id: string) {
       this.selectedProvinceId = id;
       select_province_by_id(id);
