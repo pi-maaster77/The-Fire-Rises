@@ -1,13 +1,12 @@
 // devtools/web-ui/src/stores/region.ts
-
 import { defineStore } from 'pinia';
-import * as wasm from '../wasm/map_editor.js'; // Ajustá según tu build de wasm-bindgen
+import { useStatesStore } from './states';
 
-interface Region {
+export interface Region {
   id: string;
   name: string;
   color: string;
-  stateIds: string[]; // Lista de estados que pertenecen a esta región
+  stateIds: string[];
 }
 
 export const useRegionStore = defineStore('regions', {
@@ -16,29 +15,49 @@ export const useRegionStore = defineStore('regions', {
     activeRegionId: null as string | null,
   }),
 
+  getters: {
+    activeRegion: (state) => state.regions.find(r => r.id === state.activeRegionId),
+    
+    // Estados que aún no tienen región asignada
+    unassignedStates: (state) => {
+      const statesStore = useStatesStore();
+      const assigned = state.regions.flatMap(r => r.stateIds);
+      return statesStore.allStateIds.filter(id => !assigned.includes(id));
+    }
+  },
+
   actions: {
     createRegion(name: string, color: string) {
       const id = `reg_${Date.now()}`;
       this.regions.push({ id, name, color, stateIds: [] });
-      this.setActiveRegion(id);
-    },
-
-    setActiveRegion(id: string | null) {
       this.activeRegionId = id;
-      // Llamada crucial al Bridge de Rust que definimos antes
-      wasm.set_active_region(id);
     },
 
-    // Esta función la llamará el Bridge (outbound) cuando Bevy detecte el click
-    addStateToRegion(stateId: string, regionId: string) {
+    // 100% UI: No depende de clicks en el mapa
+    assignStateToRegion(stateId: string, regionId: string) {
+      // Un estado solo pertenece a una región
+      this.regions.forEach(r => {
+        r.stateIds = r.stateIds.filter(id => id !== stateId);
+      });
+
       const region = this.regions.find(r => r.id === regionId);
       if (region && !region.stateIds.includes(stateId)) {
-        // Quitamos el estado de cualquier otra región (un estado solo puede estar en una)
-        this.regions.forEach(r => {
-          r.stateIds = r.stateIds.filter(id => id !== stateId);
-        });
         region.stateIds.push(stateId);
       }
+      
+      this.syncWithRust();
+    },
+
+    removeStateFromRegion(stateId: string) {
+      if (this.activeRegion) {
+        this.activeRegion.stateIds = this.activeRegion.stateIds.filter(id => id !== stateId);
+        this.syncWithRust();
+      }
+    },
+
+    syncWithRust() {
+      // Aquí podrías llamar a una función de Rust que pinte todas las regiones de un saque
+      // update_bevy_region_colors(JSON.stringify(this.regions));
     }
   }
 });
