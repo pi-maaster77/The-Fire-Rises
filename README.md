@@ -97,6 +97,20 @@ Definen la capacidad de proyección de fuerza y el acceso a hardware avanzado.
 * **Estandarización:** Bonos de combate al usar equipos del mismo origen tecnológico (compatibilidad de calibres y sistemas).
 * **Defensa Colectiva:** Un ataque a un miembro activa el estado de guerra para toda la facción.
 
+---
+
+## 🛠️ Stack Tecnológico
+
+El proyecto utiliza una arquitectura desacoplada para maximizar el rendimiento de la simulación:
+
+* **Backend (Simulación):** [Rust](https://www.rust-lang.org/) con **Axum** para la API y WebSockets. Maneja la lógica económica, militar y el cronómetro de patentes.
+* **Frontend (Visualización):** [Vue.js 3](https://vuejs.org/) + [TypeScript](https://www.typescriptlang.org/).
+* **Motor de Mapa:** [PixiJS](https://pixijs.com/) para el renderizado de alto rendimiento del mapa 2D.
+* **Comunicación:** Híbrido WebSockets (updates de estado) y REST (comandos de usuario).
+* **Base de Datos:** PostgreSQL (vía FastAPI para persistencia de partidas largas).
+
+---
+
 ## ⚖️ Licencia
 
 Este proyecto está bajo la licencia **GNU Affero General Public License v3.0 (AGPL-3.0)**.

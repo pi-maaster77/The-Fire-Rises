@@ -1,8 +1,5 @@
 [workspace]
 members = [
-    "backend",
-    "frontend/map",
-		"devtools/map-editor",
-    "shared", # Si decidiste crear la carpeta shared
+    "backend"
 ]
 resolver = "2"
