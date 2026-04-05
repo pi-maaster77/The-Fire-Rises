@@ -3,12 +3,18 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { MapEngine } from './engine/MapEngine'
+import mapDataJson from './data/map_test.json' // Ajusta la ruta de tu JSON
+import type { MapData } from '@/types/Map'
 
 const canvasContainer = ref<HTMLElement | null>(null)
 
 onMounted(() => {
   if (canvasContainer.value) {
-    new MapEngine(canvasContainer.value)
+    const engine = new MapEngine(canvasContainer.value)
+    // Esperamos un frame para asegurar que Pixi se inicializó
+    setTimeout(() => {
+      engine.renderMap(mapDataJson as unknown as MapData)
+    }, 100)
   }
 })
 </script>
