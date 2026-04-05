@@ -17,6 +17,7 @@ impl Plugin for BridgePlugin {
             assignments::sync_region_settings,
             assignments::create_region_system,
             assignments::create_state_system,
+            assignments::update_state_region_system,
             assignments::trigger_export_event_system,
             assignments::export_map_system,
         ));

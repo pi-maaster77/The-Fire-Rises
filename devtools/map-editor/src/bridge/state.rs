@@ -14,5 +14,6 @@ lazy_static! {
 		pub static ref ACTIVE_REGION_UPDATE: Mutex<Option<Option<String>>> = Mutex::new(None);
 		pub static ref REGION_CREATION: Mutex<Option<(String, String)>> = Mutex::new(None);
 		pub static ref STATE_CREATION: Mutex<Option<(String, String, String)>> = Mutex::new(None);
+		pub static ref STATE_REGION_UPDATE: Mutex<Option<(String, Option<String>)>> = Mutex::new(None);
 		pub static ref EXPORT_TRIGGER: Mutex<bool> = Mutex::new(false);
 }

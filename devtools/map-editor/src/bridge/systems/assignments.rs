@@ -1,6 +1,6 @@
 // devtools/map-editor/src/bridge/systems/assignments.rs
 use bevy::prelude::*;
-use crate::{bridge::state::{BRUSH_UPDATE, ACTIVE_REGION_UPDATE, REGION_CREATION, STATE_CREATION, EXPORT_TRIGGER}, map::systems::interactions::brush::BrushSettings, map::components::{ActiveRegionEditing, Region, State, Province}, map::systems::interactions::events::ExportTriggerEvent};
+use crate::{bridge::state::{BRUSH_UPDATE, ACTIVE_REGION_UPDATE, REGION_CREATION, STATE_CREATION, STATE_REGION_UPDATE, EXPORT_TRIGGER}, map::systems::interactions::brush::BrushSettings, map::components::{ActiveRegionEditing, Region, State, Province}, map::systems::interactions::events::ExportTriggerEvent};
 use crate::bridge::outbound::send_to_vue;
 use serde_json::json;
 
@@ -36,6 +36,19 @@ pub fn create_state_system(mut commands: Commands) {
     if let Ok(mut guard) = STATE_CREATION.lock() {
         if let Some((id, name, region_id)) = guard.take() {
             commands.spawn(State { id, name, region_id });
+        }
+    }
+}
+
+pub fn update_state_region_system(mut states: Query<&mut State>) {
+    if let Ok(mut guard) = STATE_REGION_UPDATE.lock() {
+        if let Some((state_id, region_id)) = guard.take() {
+            for mut state in states.iter_mut() {
+                if state.id == state_id {
+                    state.region_id = region_id.unwrap_or_else(|| "".to_string());
+                    break;
+                }
+            }
         }
     }
 }

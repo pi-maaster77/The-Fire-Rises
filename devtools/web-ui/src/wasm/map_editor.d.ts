@@ -19,6 +19,8 @@ export function trigger_export_map(): void;
 
 export function update_brush_settings(active: boolean, state_id?: string | null): void;
 
+export function update_state_region(state_id: string, region_id?: string | null): void;
+
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
@@ -31,6 +33,7 @@ export interface InitOutput {
     readonly set_active_region: (a: number, b: number) => void;
     readonly trigger_export_map: () => void;
     readonly update_brush_settings: (a: number, b: number, c: number) => void;
+    readonly update_state_region: (a: number, b: number, c: number, d: number) => void;
     readonly run_app: () => void;
     readonly wgpu_render_pass_draw: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly wgpu_render_pass_draw_indexed: (a: number, b: number, c: number, d: number, e: number, f: number) => void;

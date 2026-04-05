@@ -9,6 +9,7 @@ export const select_province_by_id: (a: number, b: number) => void;
 export const set_active_region: (a: number, b: number) => void;
 export const trigger_export_map: () => void;
 export const update_brush_settings: (a: number, b: number, c: number) => void;
+export const update_state_region: (a: number, b: number, c: number, d: number) => void;
 export const run_app: () => void;
 export const wgpu_render_pass_draw: (a: number, b: number, c: number, d: number, e: number) => void;
 export const wgpu_render_pass_draw_indexed: (a: number, b: number, c: number, d: number, e: number, f: number) => void;

@@ -30,7 +30,8 @@ pub fn camera_control_system(
         if let Some(cursor_pos) = window.cursor_position() {
             // Convertimos posición del cursor (pantalla) a coordenadas relativas al centro
             let window_size = Vec2::new(window.width(), window.height());
-            let mouse_rel = cursor_pos - window_size / 2.0;
+            let mut mouse_rel = cursor_pos - window_size / 2.0;
+						mouse_rel.y = -mouse_rel.y;
             
             // Punto en el mundo antes del zoom
             let mouse_world_before = transform.translation.truncate() + mouse_rel * projection.scale;

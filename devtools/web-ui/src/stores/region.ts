@@ -1,6 +1,7 @@
 // devtools/web-ui/src/stores/region.ts
 import { defineStore } from 'pinia';
 import { useStatesStore } from './states';
+import { update_state_region } from '../wasm/map_editor.js';
 
 export interface Region {
   id: string;
@@ -47,12 +48,22 @@ export const useRegionStore = defineStore('regions', {
       const statesStore = useStatesStore();
       statesStore.setStateRegion(stateId, this.activeRegion?.id ?? null);
       
+      // Actualizar en Rust
+      update_state_region(stateId, this.activeRegion?.id ?? null);
+      
       this.syncWithRust();
     },
 
     removeStateFromRegion(stateId: string) {
       if (this.activeRegion) {
         this.activeRegion.stateIds = this.activeRegion.stateIds.filter(id => id !== stateId);
+        
+        const statesStore = useStatesStore();
+        statesStore.setStateRegion(stateId, null);
+        
+        // Actualizar en Rust
+        update_state_region(stateId, null);
+        
         this.syncWithRust();
       }
     },

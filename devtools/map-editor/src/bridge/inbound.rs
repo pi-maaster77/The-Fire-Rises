@@ -51,6 +51,13 @@ pub fn create_state(id: String, name: String, region_id: String) {
 }
 
 #[wasm_bindgen]
+pub fn update_state_region(state_id: String, region_id: Option<String>) {
+    if let Ok(mut guard) = crate::bridge::state::STATE_REGION_UPDATE.lock() {
+        *guard = Some((state_id, region_id));
+    }
+}
+
+#[wasm_bindgen]
 pub fn trigger_export_map() {
     if let Ok(mut guard) = EXPORT_TRIGGER.lock() {
         *guard = true;
