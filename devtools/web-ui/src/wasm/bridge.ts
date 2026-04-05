@@ -7,7 +7,8 @@ import { update_brush_settings } from './map_editor.js';
 export type InboundEvent = 
   | { type: 'COUNTER_UPDATED'; payload: number }
   | { type: 'PROVINCE_SELECTED'; payload: { province: any; state: any } }
-  | { type: 'SCAN_COMPLETED'; payload: { provinces: string[] } };
+  | { type: 'SCAN_COMPLETED'; payload: { provinces: string[] } }
+  | { type: 'MAP_EXPORTED'; payload: Record<string, any> };
 
 export function setupBridge() {
   const mapStore = useMapStore();
@@ -17,11 +18,15 @@ export function setupBridge() {
       case 'PROVINCE_SELECTED':
         mapStore.selectedProvince = event.payload.province;
         mapStore.selectedState = event.payload.state;
-        console.log(event.payload)
+        console.log(event.payload);
         break;
       case 'SCAN_COMPLETED':
         mapStore.provinces = event.payload.provinces;
         console.log('Scan completed:', event.payload.provinces);
+        break;
+      case 'MAP_EXPORTED':
+        mapStore.setExportedMap(event.payload);
+        console.log('Map exported:', event.payload);
         break;
     }
   };

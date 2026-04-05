@@ -1,7 +1,7 @@
 // devtools/map-editor/src/bridge/inbound.rs
 
 use wasm_bindgen::prelude::wasm_bindgen;
-use crate::bridge::state::{ACTIVE_REGION_UPDATE, BRUSH_UPDATE, EXTERNAL_SELECTION, MAP_IMAGE_DATA, STATE_ASSIGNMENTS};
+use crate::bridge::state::{ACTIVE_REGION_UPDATE, BRUSH_UPDATE, EXTERNAL_SELECTION, MAP_IMAGE_DATA, STATE_ASSIGNMENTS, REGION_CREATION, STATE_CREATION, EXPORT_TRIGGER};
 
 #[wasm_bindgen]
 pub fn load_map_image(data: &[u8], width: u32, height: u32) {
@@ -33,5 +33,26 @@ pub fn update_brush_settings(active: bool, state_id: Option<String>) {
 pub fn set_active_region(region_id: Option<String>) {
     if let Ok(mut guard) = ACTIVE_REGION_UPDATE.lock() {
         *guard = Some(region_id);
+    }
+}
+
+#[wasm_bindgen]
+pub fn create_region(id: String, name: String) {
+    if let Ok(mut guard) = REGION_CREATION.lock() {
+        *guard = Some((id, name));
+    }
+}
+
+#[wasm_bindgen]
+pub fn create_state(id: String, name: String, region_id: String) {
+    if let Ok(mut guard) = STATE_CREATION.lock() {
+        *guard = Some((id, name, region_id));
+    }
+}
+
+#[wasm_bindgen]
+pub fn trigger_export_map() {
+    if let Ok(mut guard) = EXPORT_TRIGGER.lock() {
+        *guard = true;
     }
 }

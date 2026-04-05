@@ -50,6 +50,18 @@ const handleFileUpload = async (event: Event) => {
       <p>ID: {{ mapStore.selectedProvince.id }}</p>
     </div>
 
+    <button class="btn-export" @click="mapStore.exportMap()" :disabled="isLoading">
+      Exportar mapa
+    </button>
+
+    <button
+      class="btn-download"
+      v-if="mapStore.exportedMap"
+      @click="mapStore.downloadExportedMap()"
+    >
+      Descargar JSON
+    </button>
+
     <SelectProvince v-if="mapStore.provinces"/>
   </div>
 </template>

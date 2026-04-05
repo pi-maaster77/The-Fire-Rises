@@ -43,6 +43,9 @@ export const useRegionStore = defineStore('regions', {
       if (region && !region.stateIds.includes(stateId)) {
         region.stateIds.push(stateId);
       }
+
+      const statesStore = useStatesStore();
+      statesStore.setStateRegion(stateId, this.activeRegion?.id ?? null);
       
       this.syncWithRust();
     },

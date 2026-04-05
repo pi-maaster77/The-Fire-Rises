@@ -10,7 +10,7 @@ mod click_handler; // Podés separar la lógica de click aquí
 use crate::map::systems::interactions::brush::brush_system;
 use crate::map::systems::interactions::brush::BrushSettings;
 use self::region_handler::handle_region_assignment;
-use self::events::{MapClickEvent, ProvinceSelectedEvent};
+use self::events::{MapClickEvent, ProvinceSelectedEvent, ExportTriggerEvent};
 use self::click_handler::{emit_map_events, resolve_province_click, handle_province_selection};
 
 pub struct InteractionsPlugin;
@@ -21,6 +21,7 @@ impl Plugin for InteractionsPlugin {
 				    .init_resource::<BrushSettings>()
             .add_event::<MapClickEvent>()
             .add_event::<ProvinceSelectedEvent>()
+            .add_event::<ExportTriggerEvent>()
             .add_systems(Update, (
                 emit_map_events,
                 resolve_province_click,

@@ -23,6 +23,7 @@ pub fn run_app() {
         }))
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .add_plugins(map::MapPlugin)
+        .add_plugins(bridge::BridgePlugin)
         .add_systems(Startup, setup_camera)
         .run();
 }

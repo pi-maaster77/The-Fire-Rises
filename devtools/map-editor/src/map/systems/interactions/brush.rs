@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use wasm_bindgen::prelude::wasm_bindgen;
-use crate::{bridge::systems::selection::RenderUpdateTrigger, map::components::{ProvincePixelMap, ProvinceStateMap}};
+use crate::{bridge::systems::selection::RenderUpdateTrigger, map::components::{ProvincePixelMap, ProvinceStateMap, Province}};
 
 pub fn brush_system(
     mut commands: Commands,
@@ -12,6 +12,7 @@ pub fn brush_system(
     brush: Res<BrushSettings>,
     pixel_map: Res<ProvincePixelMap>,
     mut state_map: ResMut<ProvinceStateMap>,
+    mut provinces: Query<&mut Province>,
 ) {
     // Si no estamos pintando o no hay click, no hacemos nada
     if !brush.is_painting || !mouse.pressed(MouseButton::Left) { return; }
@@ -33,6 +34,9 @@ pub fn brush_system(
                 // Si la provincia no tiene ese estado, la pintamos
                 if state_map.0.get(prov_id) != Some(target_state) {
                     state_map.0.insert(prov_id.clone(), target_state.clone());
+                    if let Some(mut province) = provinces.iter_mut().find(|p| p.id == *prov_id) {
+                        province.state_id = target_state.clone();
+                    }
                     commands.insert_resource(RenderUpdateTrigger);
                 }
             }

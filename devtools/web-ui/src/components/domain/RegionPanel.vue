@@ -1,9 +1,10 @@
 <!-- devtools/web-ui/src/components/domain/RegionPanel.vue -->
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useRegionStore } from '../../stores/region';
 import { useStatesStore } from '../../stores/states';
+import { set_active_region, create_region } from '../../wasm/map_editor.js';
 
 const regionStore = useRegionStore();
 const statesStore = useStatesStore();
@@ -17,13 +18,20 @@ const selectedStateId = ref("")
 
 function saveRegion(){
 	regionStore.createRegion(regionId.value, regionName.value, regionColor.value)
-	regionId.value, regionName.value, regionColor.value = ""
+	create_region(regionId.value, regionName.value)
+	regionId.value = '';
+	regionName.value = '';
+	regionColor.value = '#000000';
 }
 
 function assignState(){
 	regionStore.assignStateToRegion(selectedStateId.value)
 	selectedStateId.value = ""
 }
+
+watch(() => regionStore.activeRegionId, (newId) => {
+  set_active_region(newId);
+});
 
 function getTextColor(hex: string): string {
   // quitar #

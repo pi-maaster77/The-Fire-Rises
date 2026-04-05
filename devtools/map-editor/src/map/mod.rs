@@ -6,6 +6,7 @@ use bevy::prelude::*;
 
 pub mod components;
 pub mod systems;
+pub mod map_loader;
 
 use self::systems::setup::spawn_map;
 use self::systems::scanner::scanner_system;

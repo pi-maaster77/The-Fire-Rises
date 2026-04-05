@@ -128,3 +128,46 @@ for i, region_index in enumerate(vor.point_region):
 
 img.save("mapa_random.png")
 print("OK -> mapa_random.png")
+
+# ----------------------------
+# Exportar para el editor
+# ----------------------------
+import json
+
+# Convertir puntos a lista de listas para JSON
+seed_points = [[float(p[0]), float(p[1])] for p in points]
+
+# Crear provincias con seed_index
+provinces = []
+for i in range(len(points)):
+    provinces.append({
+        "id": f"PROV_{i:03d}",
+        "seed_index": i,
+        "state_id": "",
+        "region_id": None,
+        "center": [float(points[i][0]), float(points[i][1])]
+    })
+
+export_data = {
+    "version": "1.0",
+    "map_params": {
+        "width": WIDTH,
+        "height": HEIGHT,
+        "voronoi_points": NUM_POINTS,
+        "lloyd_iterations": RELAX_ITER
+    },
+    "seed_points": seed_points,
+    "regions": [],
+    "states": [],
+    "provinces": provinces
+}
+
+# Guardar como JSON minificado para menor tamaño
+with open("map_export.json", "w") as f:
+    json.dump(export_data, f, separators=(',', ':'))
+
+# Calcular tamaño
+json_size = len(json.dumps(export_data, separators=(',', ':'))) / (1024 * 1024)
+print(f"OK -> map_export.json ({json_size:.2f} MB)")
+print(f"   - {len(points)} provincias")
+print(f"   - {len(seed_points)} seed_points")

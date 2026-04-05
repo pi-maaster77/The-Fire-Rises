@@ -3,6 +3,10 @@
 
 export function assign_province_to_state(province_id: string, state_id: string): void;
 
+export function create_region(id: string, name: string): void;
+
+export function create_state(id: string, name: string, region_id: string): void;
+
 export function load_map_image(data: Uint8Array, width: number, height: number): void;
 
 export function run_app(): void;
@@ -11,6 +15,8 @@ export function select_province_by_id(id: string): void;
 
 export function set_active_region(region_id?: string | null): void;
 
+export function trigger_export_map(): void;
+
 export function update_brush_settings(active: boolean, state_id?: string | null): void;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -18,9 +24,12 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly assign_province_to_state: (a: number, b: number, c: number, d: number) => void;
+    readonly create_region: (a: number, b: number, c: number, d: number) => void;
+    readonly create_state: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
     readonly load_map_image: (a: number, b: number, c: number, d: number) => void;
     readonly select_province_by_id: (a: number, b: number) => void;
     readonly set_active_region: (a: number, b: number) => void;
+    readonly trigger_export_map: () => void;
     readonly update_brush_settings: (a: number, b: number, c: number) => void;
     readonly run_app: () => void;
     readonly wgpu_render_pass_draw: (a: number, b: number, c: number, d: number, e: number) => void;

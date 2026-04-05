@@ -96,3 +96,14 @@ Definen la capacidad de proyección de fuerza y el acceso a hardware avanzado.
 * **Integración Industrial:** Los miembros comparten sus **Árboles Nacionales** de defensa. Si un miembro libera una patente militar, el resto de la facción la recibe poco después.
 * **Estandarización:** Bonos de combate al usar equipos del mismo origen tecnológico (compatibilidad de calibres y sistemas).
 * **Defensa Colectiva:** Un ataque a un miembro activa el estado de guerra para toda la facción.
+
+## ⚖️ Licencia
+
+Este proyecto está bajo la licencia **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+### ¿Qué significa esto?
+* **Copyleft total:** Si modificás el código y lo distribuís **o lo ofrecés como un servicio a través de una red (SaaS)**, estás obligado a liberar tus cambios bajo esta misma licencia.
+* **Transparencia:** Nadie puede usar este código para crear una versión "cerrada" o privada del juego.
+* **Atribución:** Debés mantener los avisos de copyright originales.
+
+Para más detalles, consultá el archivo [LICENSE](./LICENSE).

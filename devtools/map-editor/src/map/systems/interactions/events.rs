@@ -1,4 +1,4 @@
-// devtools/map-editor/src/map/events.rs
+// devtools/map-editor/src/map/systems/interactions/events.rs
 
 use bevy::prelude::*;
 
@@ -11,3 +11,7 @@ pub struct MapClickEvent {
 pub struct ProvinceSelectedEvent {
     pub province_id: String,
 }
+
+#[derive(Event)]
+pub struct ExportTriggerEvent;
+
