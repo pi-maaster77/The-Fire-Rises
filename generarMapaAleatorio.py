@@ -1,5 +1,7 @@
 # generarMapaAleatorio.py
 
+# este archivo genera un mapa de vornoi aleatorio con relajación de Lloyd, lo colorea evitando vecinos iguales y exporta un JSON para el editor
+
 import numpy as np
 from scipy.spatial import Voronoi
 from PIL import Image, ImageDraw
@@ -7,7 +9,7 @@ import random
 
 WIDTH = 1024
 HEIGHT = 1024
-NUM_POINTS = 2000
+NUM_POINTS = 20
 RELAX_ITER = 3
 
 COLORS = ["#FFFF00", "#FFFF22", "#FFFF44", "#FFFF66", "#FFFF88", "#FFFFAA", "#FFFFCC", "#FFFFFF"]
@@ -141,9 +143,9 @@ seed_points = [[float(p[0]), float(p[1])] for p in points]
 provinces = []
 for i in range(len(points)):
     provinces.append({
-        "id": f"PROV_{i:03d}",
+        "id": f"{i:08d}",
         "seed_index": i,
-        "state_id": "",
+        "state_id": None,
         "region_id": None,
         "center": [float(points[i][0]), float(points[i][1])]
     })
@@ -164,10 +166,10 @@ export_data = {
 
 # Guardar como JSON minificado para menor tamaño
 with open("map_export.json", "w") as f:
-    json.dump(export_data, f, separators=(',', ':'))
+    json.dump(export_data, f, separators=(',', ':'), indent=4)
 
 # Calcular tamaño
-json_size = len(json.dumps(export_data, separators=(',', ':'))) / (1024 * 1024)
+json_size = len(json.dumps(export_data, separators=(',', ':'), indent=4)) / (1024 * 1024)
 print(f"OK -> map_export.json ({json_size:.2f} MB)")
 print(f"   - {len(points)} provincias")
 print(f"   - {len(seed_points)} seed_points")
