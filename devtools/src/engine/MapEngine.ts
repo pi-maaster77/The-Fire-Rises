@@ -3,7 +3,7 @@
 import { Application, Container, Graphics, Point } from 'pixi.js'
 import { Viewport } from 'pixi-viewport'
 import { Delaunay, Voronoi } from 'd3-delaunay'
-import type { MapData } from '@/types/Map'
+import type { MapData, Province } from '@/types/Map'
 
 export class MapEngine {
   public app: Application
@@ -17,6 +17,13 @@ export class MapEngine {
   // Capas
   private backgroundLayer = new Container()
   private highlightGraphics = new Graphics() // Solo para la provincia bajo el mouse
+
+  // Brocha
+  private editLayer = new Container() // Nueva capa para provincias modificadas
+  public onProvinceClick?: (index: number) => void
+  private isMouseDown = false
+  public onBrushStroke?: (provinceIndex: number) => void
+  private lastHoverIndex: number | null = null // Para optimizar la brocha
 
   constructor(parentElement: HTMLElement) {
     this.app = new Application()
@@ -44,7 +51,7 @@ export class MapEngine {
     this.viewport.addChild(this.highlightGraphics)
 
     // Evento centralizado de mouse
-    this.viewport.on('click', (e) => this.handleClick(e.global))
+    this.viewport.on('click', (e) => this.handleMapClick(e.global))
 
     this.app.renderer.events.cursorStyles.default = 'default'
 
@@ -65,6 +72,27 @@ export class MapEngine {
 
     // Escuchamos el click solo en el viewport
     this.viewport.on('pointertap', (e) => this.handleMapClick(e.global))
+
+    this.viewport.addChild(this.backgroundLayer)
+    this.viewport.addChild(this.editLayer) // Capa intermedia
+    this.viewport.addChild(this.highlightGraphics)
+
+    // Listeners para la brocha
+    this.viewport.on('pointerdown', (e) => {
+      this.isMouseDown = true
+      this.handleBrush(e.global)
+    })
+
+    this.viewport.on('pointermove', (e) => {
+      if (this.isMouseDown) {
+        this.handleBrush(e.global)
+      }
+    })
+
+    window.addEventListener('pointerup', () => {
+      this.isMouseDown = false
+      this.lastHoverIndex = null // Reset para permitir pintar la misma al volver
+    })
   }
 
   public renderMap(data: MapData) {
@@ -99,6 +127,38 @@ export class MapEngine {
     this.viewport.fitWorld()
   }
 
+  public updateProvinceVisual(index: number, color: number) {
+    if (!this.voronoi) return
+
+    const polygon = this.voronoi.cellPolygon(index)
+    if (polygon) {
+      const pGraphics = new Graphics()
+      pGraphics
+        .poly(polygon.flat())
+        .fill({ color, alpha: 0.9 })
+        .stroke({ width: 1, color: 0xffffff, alpha: 0.5 })
+
+      // Añadimos a la capa de edición
+      this.editLayer.addChild(pGraphics)
+    }
+  }
+
+  private handleBrush(globalPos: Point) {
+    if (!this.delaunay || !this.mapData) return
+
+    const worldPos = this.viewport.toWorld(globalPos)
+    const index = this.delaunay.find(worldPos.x, worldPos.y)
+
+    // Evitamos repintar la misma provincia mil veces mientras el mouse está quieto
+    if (index !== -1 && index !== this.lastHoverIndex) {
+      this.lastHoverIndex = index
+
+      if (this.onBrushStroke) {
+        this.onBrushStroke(index)
+      }
+    }
+  }
+
   private handleMapClick(globalPos: Point) {
     if (!this.delaunay || !this.voronoi || !this.mapData) return
 
@@ -109,8 +169,8 @@ export class MapEngine {
     const index = this.delaunay.find(worldPos.x, worldPos.y)
 
     if (index !== -1) {
-      const province = this.mapData.provinces[index]
-      console.log(`Provincia clickeada: ${province.id}`, province)
+      const province: Province | undefined = this.mapData.provinces[index]
+      console.log(`Provincia clickeada: ${province?.id}`, province)
 
       const polygon = this.voronoi.cellPolygon(index)
       if (polygon) {
@@ -118,8 +178,8 @@ export class MapEngine {
         this.highlightGraphics.clear()
         this.highlightGraphics
           .poly(polygon.flat())
-          .fill({ color: 0xffffff, alpha: 0.4 })
-          .stroke({ width: 3, color: 0xffffff, alpha: 1 })
+          .fill({ color: 0xccff00, alpha: 0.2 })
+          .stroke({ width: 3, color: 0xccff00, alpha: 1 })
       }
     }
   }

@@ -7,9 +7,9 @@ from scipy.spatial import Voronoi
 from PIL import Image, ImageDraw
 import random
 
-WIDTH = 1024
-HEIGHT = 1024
-NUM_POINTS = 20000
+WIDTH = 1000
+HEIGHT = 1000
+NUM_POINTS = 100
 RELAX_ITER = 3
 
 COLORS = ["#FFFF00", "#FFFF22", "#FFFF44", "#FFFF66", "#FFFF88", "#FFFFAA", "#FFFFCC", "#FFFFFF"]

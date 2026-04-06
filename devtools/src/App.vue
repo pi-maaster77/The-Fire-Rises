@@ -5,6 +5,7 @@ import { onMounted, ref } from 'vue'
 import { MapEngine } from './engine/MapEngine'
 import mapDataJson from './data/map_test.json' // Ajusta la ruta de tu JSON
 import type { MapData } from '@/types/Map'
+import FileInput from './components/ui/input/FileInput.vue'
 
 const fps = ref(0)
 const canvasContainer = ref<HTMLElement | null>(null)
@@ -68,18 +69,15 @@ function onFileUpload(event: Event) {
       <div class="stats">
         <span>FPS: {{ fps }}</span>
       </div>
-      <h1>The Fire Rises</h1>
-      <p>Año: 1985</p>
-      <input type="file" accept=".json" @change="onFileUpload" />
-      <button @click="console.log('boton')"></button>
+      <FileInput @change="onFileUpload"> ⬆️ </FileInput>
     </div>
   </main>
 </template>
 
 <style scoped>
 .map-viewport {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   position: absolute;
   top: 0;
   left: 0;
@@ -96,10 +94,7 @@ function onFileUpload(event: Event) {
 }
 
 /* Hacemos que los controles SÍ reaccionen al mouse */
-.ui-overlay h1,
-.ui-overlay p,
-.ui-overlay input,
-.ui-overlay button {
+.ui-overlay * {
   pointer-events: auto;
 }
 </style>
