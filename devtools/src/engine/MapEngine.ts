@@ -45,6 +45,26 @@ export class MapEngine {
 
     // Evento centralizado de mouse
     this.viewport.on('click', (e) => this.handleClick(e.global))
+
+    this.app.renderer.events.cursorStyles.default = 'default'
+
+    this.viewport = new Viewport({
+      events: this.app.renderer.events,
+      disableOnCheck: true, // Optimización v8
+    })
+
+    // IMPORTANTE: El fondo no debe procesar eventos individuales
+    this.backgroundLayer.eventMode = 'none'
+    this.backgroundLayer.interactiveChildren = false
+
+    this.viewport.drag().pinch().wheel().decelerate()
+    this.app.stage.addChild(this.viewport)
+
+    this.viewport.addChild(this.backgroundLayer)
+    this.viewport.addChild(this.highlightGraphics)
+
+    // Escuchamos el click solo en el viewport
+    this.viewport.on('pointertap', (e) => this.handleMapClick(e.global))
   }
 
   public renderMap(data: MapData) {
@@ -79,24 +99,27 @@ export class MapEngine {
     this.viewport.fitWorld()
   }
 
-  private handleClick(globalPos: Point) {
+  private handleMapClick(globalPos: Point) {
     if (!this.delaunay || !this.voronoi || !this.mapData) return
 
-    // Convertir posición de pantalla a posición del mundo (mapa)
+    // 1. Convertir coordenadas
     const worldPos = this.viewport.toWorld(globalPos)
 
-    // Búsqueda ultrarrápida del índice de la provincia
+    // 2. Encontrar el índice (esto es O(log n), extremadamente rápido)
     const index = this.delaunay.find(worldPos.x, worldPos.y)
 
     if (index !== -1) {
+      const province = this.mapData.provinces[index]
+      console.log(`Provincia clickeada: ${province.id}`, province)
+
       const polygon = this.voronoi.cellPolygon(index)
       if (polygon) {
-        // Solo redibujamos el polígono de selección
+        // 3. Dibujar el resaltado solo una vez
         this.highlightGraphics.clear()
         this.highlightGraphics
           .poly(polygon.flat())
-          .fill({ color: 0xffffff, alpha: 0.3 })
-          .stroke({ width: 2, color: 0xffffff, alpha: 0.8 })
+          .fill({ color: 0xffffff, alpha: 0.4 })
+          .stroke({ width: 3, color: 0xffffff, alpha: 1 })
       }
     }
   }
