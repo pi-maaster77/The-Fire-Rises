@@ -2,3 +2,4 @@ Cargo.lock
 target
 header
 .vscode
+map_export.json
