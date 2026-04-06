@@ -6,17 +6,58 @@ import { MapEngine } from './engine/MapEngine'
 import mapDataJson from './data/map_test.json' // Ajusta la ruta de tu JSON
 import type { MapData } from '@/types/Map'
 
+const fps = ref(0)
 const canvasContainer = ref<HTMLElement | null>(null)
+const engine = ref<MapEngine | null>(null)
 
-onMounted(() => {
+const updateFPS = () => {
+  if (engine.value?.app.ticker) {
+    // Math.round para no tener decimales molestos
+    fps.value = Math.round(engine.value.app.ticker.FPS)
+  }
+}
+
+onMounted(async () => {
   if (canvasContainer.value) {
-    const engine = new MapEngine(canvasContainer.value)
+    const engineInstance = new MapEngine(canvasContainer.value)
+    engine.value = engineInstance
+
+    await engineInstance.initPromise
+    engineInstance.app.ticker.add(updateFPS)
     // Esperamos un frame para asegurar que Pixi se inicializó
     setTimeout(() => {
-      engine.renderMap(mapDataJson as unknown as MapData)
+      engine.value?.renderMap(mapDataJson as unknown as MapData)
     }, 100)
   }
 })
+
+function onFileUpload(event: Event) {
+  const input = event.target as HTMLInputElement
+
+  if (!input.files || input.files.length === 0) return
+
+  const file = input.files[0]
+
+  const reader = new FileReader()
+
+  reader.onload = (e) => {
+    try {
+      const text = e.target?.result as string
+      const json = JSON.parse(text) as MapData
+
+      console.log('Mapa cargado:', json)
+
+      engine.value?.renderMap(json)
+    } catch (err) {
+      console.error('Error al parsear JSON:', err)
+      alert('Archivo inválido')
+    }
+  }
+
+  if (file) {
+    reader.readAsText(file)
+  }
+}
 </script>
 
 <template>
@@ -24,8 +65,13 @@ onMounted(() => {
     <div ref="canvasContainer" class="map-viewport"></div>
 
     <div class="ui-overlay">
+      <div class="stats">
+        <span>FPS: {{ fps }}</span>
+      </div>
       <h1>The Fire Rises</h1>
       <p>Año: 1985</p>
+      <input type="file" accept=".json" @change="onFileUpload" />
+      <button @click="console.log('boton')"></button>
     </div>
   </main>
 </template>
@@ -43,9 +89,17 @@ onMounted(() => {
 .ui-overlay {
   position: relative;
   z-index: 10;
-  pointer-events: none; /* Para que los clicks pasen al mapa */
+  pointer-events: none; /* Los clicks pasan de largo por el fondo del div */
   color: white;
   padding: 20px;
   font-family: 'Courier New', Courier, monospace;
+}
+
+/* Hacemos que los controles SÍ reaccionen al mouse */
+.ui-overlay h1,
+.ui-overlay p,
+.ui-overlay input,
+.ui-overlay button {
+  pointer-events: auto;
 }
 </style>
