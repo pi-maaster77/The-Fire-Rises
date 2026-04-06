@@ -44,7 +44,7 @@ export class MapEngine {
     this.viewport.addChild(this.highlightGraphics)
 
     // Evento centralizado de mouse
-    this.viewport.on('pointermove', (e) => this.handleHover(e.global))
+    this.viewport.on('click', (e) => this.handleClick(e.global))
   }
 
   public renderMap(data: MapData) {
@@ -79,7 +79,7 @@ export class MapEngine {
     this.viewport.fitWorld()
   }
 
-  private handleHover(globalPos: Point) {
+  private handleClick(globalPos: Point) {
     if (!this.delaunay || !this.voronoi || !this.mapData) return
 
     // Convertir posición de pantalla a posición del mundo (mapa)
