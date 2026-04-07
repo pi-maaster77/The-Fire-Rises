@@ -2,14 +2,22 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { MapEngine } from '../../engine/MapEngine'
+import { MapEngine } from '@/engine/MapEngine'
+import { useEngineStore } from '@/stores/engine'
 
-const mapContainer = ref<HTMLElement | null>(null)
-let engine: MapEngine | null = null
+const canvasContainer = ref<HTMLElement | null>(null)
+const engineStore = useEngineStore()
 
-onMounted(() => {
-  if (mapContainer.value) {
-    engine = new MapEngine(mapContainer.value)
+onMounted(async () => {
+  if (canvasContainer.value) {
+    const engine = new MapEngine(canvasContainer.value)
+    await engine.initPromise
+
+    // Guardamos la instancia en la store para que todos la usen
+    engineStore.setEngine(engine)
+
+    // Render inicial
+    // engineStore.instance.renderMap(data)
   }
 })
 </script>

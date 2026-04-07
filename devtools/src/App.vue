@@ -6,6 +6,7 @@ import { MapEngine } from './engine/MapEngine'
 import mapDataJson from './data/map_test.json' // Ajusta la ruta de tu JSON
 import type { MapData } from '@/types/Map'
 import FileInput from './components/ui/input/FileInput.vue'
+import ToolBox from './components/layout/ToolBox.vue'
 
 const fps = ref(0)
 const canvasContainer = ref<HTMLElement | null>(null)
@@ -66,10 +67,14 @@ function onFileUpload(event: Event) {
     <div ref="canvasContainer" class="map-viewport"></div>
 
     <div class="ui-overlay">
-      <div class="stats">
-        <span>FPS: {{ fps }}</span>
-      </div>
+      <div class="stats"></div>
       <FileInput @change="onFileUpload"> ⬆️ </FileInput>
+    </div>
+
+    <ToolBox />
+
+    <div class="fps-counter">
+      <p>FPS: {{ fps }}</p>
     </div>
   </main>
 </template>
@@ -82,6 +87,17 @@ function onFileUpload(event: Event) {
   top: 0;
   left: 0;
   overflow: hidden;
+}
+
+.fps-counter {
+  position: absolute;
+  z-index: 1000;
+  top: 10px;
+  right: 10px;
+  p {
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+  }
 }
 
 .ui-overlay {

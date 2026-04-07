@@ -22,11 +22,17 @@ export const useStateStore = defineStore('map', {
         this.states[index] = data
       }
     },
+    get(id: string) {
+      return this.states.find((state) => state.id === id)
+    },
     clear() {
       this.states = []
     },
     load(data: State[]) {
       this.states = data
+    },
+    selectState(id: string | null) {
+      this.selectedState = this.states.find((state) => state.id === id) || null
     },
     assignProvinceToState(stateId: string, provinceIndex: number) {
       const state = this.states.find((s) => s.id === stateId)
