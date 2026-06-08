@@ -11,16 +11,33 @@ export const useStateStore = defineStore('map', {
   }),
   actions: {
     add(data: State) {
+      if (this.states.some((state) => state.id === data.id)) {
+        return
+      }
+      const regex = /^[A-Z0-9]{3}$/
+
+      if (!regex.test(data.id)) {
+        console.error(
+          'ID del estado inválido. Debe ser de 3 caracteres alfanuméricos en mayúscula.',
+        )
+        return
+      }
       this.states.push(data)
     },
     remove(id: string) {
       this.states = this.states.filter((state) => state.id !== id)
     },
     update(id: string, data: State) {
-      const index = this.states.findIndex((state) => state.id === id)
-      if (index !== -1) {
-        this.states[index] = data
+      const regex = /^[A-Z0-9]{3}$/
+      if (!regex.test(data.id)) {
+        console.error(
+          'ID del estado inválido. Debe ser de 3 caracteres alfanuméricos en mayúscula.',
+        )
+        return
       }
+      const index = this.states.findIndex((state) => state.id === id)
+      if (index === -1) return
+      this.states[index] = data
     },
     get(id: string) {
       return this.states.find((state) => state.id === id)
