@@ -4,7 +4,7 @@
  * Created Date: Mo Jun 2026                                                   *
  * Author: pi-maaster77 (pimaaster1337@gmail.com)                              *
  * -----                                                                       *
- * Last Modified: Mon Jun 08 2026                                              *
+ * Last Modified: Wed Jun 10 2026                                              *
  * Modified By: pi-maaster77                                                   *
  * -----                                                                       *
  * Copyright (c) projectCreationYear-2026 The Fire Rises                       *
@@ -20,9 +20,11 @@
  * ----------	---	---------------------------------------------------------    *
  */
 
-import { Application, Container, Graphics, Point } from 'pixi.js'
+import { Application } from 'pixi.js'
 import { Viewport } from 'pixi-viewport'
 import { Delaunay, Voronoi } from 'd3-delaunay'
+import { InputManager } from './InputManager'
+import { MapRenderer } from './MapRenderer'
 import type { MapData } from '@/types/Map'
 
 export class MapEngine {
@@ -30,20 +32,14 @@ export class MapEngine {
   public viewport!: Viewport
   public initPromise: Promise<void>
 
+  private renderer!: MapRenderer
+  private input!: InputManager
+
   private mapData: MapData | null = null
   private voronoi: Voronoi<Delaunay.Point[]> | null = null
   private delaunay: Delaunay<Delaunay.Point[]> | null = null
 
-  // Capas con orden Z definido
-  private backgroundLayer = new Container()
-  private editLayer = new Container()
-  private highlightGraphics = new Graphics()
-
-  // Estado del Input
-  private isMouseDown = false
-  private lastHoverIndex: number | null = null
-
-  // Callbacks para Vue
+  // Callbacks limpios para la interfaz de Vue
   public onBrushStroke?: (provinceIndex: number) => void
   public onProvinceClick?: (provinceIndex: number) => void
 
@@ -62,63 +58,22 @@ export class MapEngine {
 
     parentElement.appendChild(this.app.canvas)
 
-    // CONFIGURACIÓN ÚNICA DEL VIEWPORT
     this.viewport = new Viewport({
       screenWidth: window.innerWidth,
       screenHeight: window.innerHeight,
       events: this.app.renderer.events,
-      // disableOnCheck: true,
     })
 
     this.viewport.drag().pinch().wheel().decelerate()
     this.app.stage.addChild(this.viewport)
 
-    // Configuración de capas
-    this.backgroundLayer.eventMode = 'none'
-    this.backgroundLayer.interactiveChildren = false
+    // Inicializar módulos secundarios
+    this.renderer = new MapRenderer(this.viewport)
+    this.input = new InputManager(this.viewport, () => this.delaunay)
 
-    // Añadir en orden de profundidad
-    this.viewport.addChild(this.backgroundLayer)
-    this.viewport.addChild(this.editLayer)
-    this.viewport.addChild(this.highlightGraphics)
-
-    // LISTENERS UNIFICADOS
-    this.viewport.on('pointerdown', (e) => {
-      this.isMouseDown = true
-      this.handleInput(e.global, 'down')
-    })
-
-    this.viewport.on('pointermove', (e) => {
-      this.handleInput(e.global, 'move')
-    })
-
-    window.addEventListener('pointerup', () => {
-      this.isMouseDown = false
-      this.lastHoverIndex = null
-    })
-  }
-
-  // Control central de interacción
-  private handleInput(globalPos: Point, type: 'down' | 'move') {
-    if (!this.delaunay || !this.mapData) return
-
-    const worldPos = this.viewport.toWorld(globalPos)
-    const index = this.delaunay.find(worldPos.x, worldPos.y)
-
-    if (index === -1) return
-
-    // Lógica de Brocha (si está presionado y hay callback)
-    if (this.isMouseDown && this.onBrushStroke) {
-      if (index !== this.lastHoverIndex) {
-        this.lastHoverIndex = index
-        this.onBrushStroke(index)
-      }
-    }
-
-    // Lógica de Resaltado/Click (si solo es movimiento o click puntual)
-    if (type === 'down' && !this.onBrushStroke) {
-      this.handleMapClick(index)
-    }
+    // Vincular inputs del gestor con la lógica del motor
+    this.input.onBrushStroke = (index) => this.handleBrush(index)
+    this.input.onClick = (index) => this.handleClick(index)
   }
 
   public setCameraControl(enabled: boolean) {
@@ -133,54 +88,35 @@ export class MapEngine {
 
   public renderMap(data: MapData) {
     this.mapData = data
-    this.backgroundLayer.removeChildren()
-    this.editLayer.removeChildren() // Limpiar edición al cargar nuevo mapa
-
     const { width, height } = data.map_params
+
     this.delaunay = Delaunay.from(data.seed_points)
     this.voronoi = this.delaunay.voronoi([0, 0, width, height])
 
-    const mainGraphics = new Graphics()
-
-    data.provinces.forEach((province) => {
-      const polygon = this.voronoi!.cellPolygon(province.seed_index)
-      if (polygon) {
-        const color = province.state_id ? 0x4444aa : 0x333333
-        mainGraphics
-          .poly(polygon.flat())
-          .fill({ color, alpha: 0.8 })
-          .stroke({ width: 0.5, color: 0x000000, alpha: 0.2 })
-      }
-    })
-
-    this.backgroundLayer.addChild(mainGraphics)
-    this.backgroundLayer.cacheAsBitmap = true
+    this.renderer.renderBaseMap(data, this.voronoi)
     this.viewport.fitWorld()
   }
 
   public updateProvinceVisual(index: number, color: number) {
-    const polygon = this.voronoi?.cellPolygon(index)
-    if (polygon) {
-      const p = new Graphics()
-      p.poly(polygon.flat())
-        .fill({ color, alpha: 0.9 })
-        .stroke({ width: 1, color: 0xffffff, alpha: 0.5 })
-      this.editLayer.addChild(p)
+    if (!this.voronoi) return
+    this.renderer.updateProvinceVisual(index, this.voronoi, color)
+  }
+
+  private handleBrush(index: number) {
+    if (this.onBrushStroke) {
+      this.onBrushStroke(index)
     }
   }
 
-  private handleMapClick(index: number) {
-    const province = this.mapData?.provinces[index]
+  private handleClick(index: number) {
+    if (!this.mapData || !this.voronoi) return
+
+    const province = this.mapData.provinces[index]
     if (province) {
-      const polygon = this.voronoi!.cellPolygon(index)
-      if (polygon) {
-        this.highlightGraphics.clear()
-        this.highlightGraphics
-          .poly(polygon.flat())
-          .fill({ color: 0xccff00, alpha: 0.2 })
-          .stroke({ width: 3, color: 0xccff00, alpha: 1 })
+      this.renderer.highlightProvince(index, this.voronoi)
+      if (this.onProvinceClick) {
+        this.onProvinceClick(index)
       }
-      if (this.onProvinceClick) this.onProvinceClick(index)
     }
   }
 }
